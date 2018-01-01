@@ -7,3 +7,17 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
+packaging/TensorFlowCppConfig.cmake
+packaging/TensorFlowCppConfigVersion.cmake
+packaging/debian/changelog
+packaging/debian/control
+packaging/debian/tensorflow-cpp-optimized.debhelper.log
+packaging/debian/tensorflow-cpp-optimized.substvars
+packaging/debian/tensorflow-cpp-optimized/
+packaging/headers/
+packaging/libs/
+tensorflow-cpp-*.dsc
+tensorflow-cpp-*.tar.gz
+tensorflow-cpp-*_source.build
+tensorflow-cpp-*_source.changes
+tensorflow/

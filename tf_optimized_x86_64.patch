@@ -1,0 +1,13 @@
+diff --git a/tensorflow/contrib/makefile/build_all_linux.sh b/tensorflow/contrib/makefile/build_all_linux.sh
+index a440633..240000a 100755
+--- a/tensorflow/contrib/makefile/build_all_linux.sh
++++ b/tensorflow/contrib/makefile/build_all_linux.sh
+@@ -43,6 +43,6 @@ tensorflow/contrib/makefile/compile_linux_protobuf.sh
+ 
+ # Build TensorFlow.
+ make -j"${JOB_COUNT}" -f tensorflow/contrib/makefile/Makefile \
+-  OPTFLAGS="-O3 -march=native" \
+-  HOST_CXXFLAGS="--std=c++11 -march=native" \
++  OPTFLAGS="-O3 -march=sandybridge -mfma" \
++  HOST_CXXFLAGS="--std=c++11 -march=sandybridge -mfma" \
+   MAKEFILE_DIR=$SCRIPT_DIR

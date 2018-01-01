@@ -1,0 +1,17 @@
+Source: tensorflow-cpp-@PKG_SUFFIX@
+Priority: optional
+Maintainer: Csaba Kertesz <csaba.kertesz@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), quilt
+Standards-Version: 3.9.1
+Section: libs
+Homepage: https://www.tensorflow.org
+
+Package: tensorflow-cpp-@PKG_SUFFIX@
+Section: libdevel
+Architecture: amd64
+Depends: cmake, ${misc:Depends}, ${shlibs:Depends}
+Conflicts: @PKG_CONFLICTS@
+Replaces: @PKG_CONFLICTS@
+Description: C++ headers and binaries for Tensorflow
+ This package contains the header files and libraries needed to compile
+ applications that use Tensorflow.

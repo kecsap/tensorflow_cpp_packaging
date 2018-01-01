@@ -1,0 +1,5 @@
+tensorflow-cpp-@PKG_SUFFIX@ (@GIT_TAG@~git@GIT_DATE@~@GIT_COMMIT@~ppa1) xenial; urgency=medium
+
+  * Packaged upstream version.
+
+ -- Csaba Kertesz <csaba.kertesz@gmail.com>  Mon, 1 Jan 2018 03:11:44 +0200
