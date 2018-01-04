@@ -1,14 +1,14 @@
 Source: tensorflow-cpp-@PKG_SUFFIX@
 Priority: optional
 Maintainer: Csaba Kertesz <csaba.kertesz@gmail.com>
-Build-Depends: debhelper (>= 7.0.50~), quilt
+Build-Depends: debhelper (>= 7.0.50~), quilt, cmake
 Standards-Version: 3.9.1
 Section: libs
 Homepage: https://www.tensorflow.org
 
 Package: tensorflow-cpp-@PKG_SUFFIX@
 Section: libdevel
-Architecture: amd64
+Architecture: @PKG_ARCH@
 Depends: cmake, ${misc:Depends}, ${shlibs:Depends}
 Conflicts: @PKG_CONFLICTS@
 Replaces: @PKG_CONFLICTS@

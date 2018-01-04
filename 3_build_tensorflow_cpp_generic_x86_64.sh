@@ -19,7 +19,7 @@ cd $DIR/tensorflow
 # Clean up
 git clean -fdx
 git reset --hard
-git apply < $DIR/tf_tensor_fix.diff || exit 1
+cat $DIR/tf_tensor_fix.txt >> tensorflow/contrib/makefile/tf_op_files.txt
 git apply < $DIR/tf_generic_x86_64.patch || exit 1
 
 # Download the dependencies

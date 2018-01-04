@@ -28,9 +28,9 @@ DATE=$(git log -1 --date=short --pretty=format:%cd | tr -d '-')
 
 # Configure & build the package
 cd $DIR/packaging
-rm -rf debian/.debhelper debian/tensorflow-cpp-generic  debian/tensorflow-cpp-generic.debhelper.log debian/tensorflow-cpp-generic.substvars
+rm -rf debian/.debhelper debian/tensorflow-cpp-*
 rm -rf debian/debhelper-build-stamp debian/files
-cmake . -DGIT_TAG=${TAG} -DGIT_COMMIT=${COMMIT} -DGIT_DATE=${DATE} -DPKG_SUFFIX=generic -DCMAKE_INSTALL_PREFIX=/usr
+cmake . -DGIT_TAG=${TAG} -DGIT_COMMIT=${COMMIT} -DGIT_DATE=${DATE} -DPKG_SUFFIX=generic -DCMAKE_INSTALL_PREFIX=/usr -DPKG_ARCH=amd64 -DRELEASE_MODE=OFF
 dpkg-buildpackage -rfakeroot -b -nc
 
 echo READY! Generic x86_64 package is generated!

@@ -1,0 +1,40 @@
+diff --git a/tensorflow/contrib/makefile/Makefile b/tensorflow/contrib/makefile/Makefile
+index ee84b5b..e57118f 100644
+--- a/tensorflow/contrib/makefile/Makefile
++++ b/tensorflow/contrib/makefile/Makefile
+@@ -97,7 +97,7 @@ endif
+ # override local versions in the source tree.
+ HOST_INCLUDES += -I/usr/local/include
+ 
+-HOST_LIBS := \
++HOST_LIBS := $(CUSTOM_HOST_LIBS) \
+ $(HOST_NSYNC_LIB) \
+ -lstdc++ \
+ -lprotobuf \
+@@ -152,7 +152,7 @@ DEPDIR := $(GENDIR)dep/
+ $(shell mkdir -p $(DEPDIR) >/dev/null)
+ 
+ # Settings for the target compiler.
+-CXX := $(CC_PREFIX) gcc
++CXX := $(CC)
+ OPTFLAGS := -O2
+ 
+ ifneq ($(TARGET),ANDROID)
+@@ -180,7 +180,7 @@ endif
+ # override local versions in the source tree.
+ INCLUDES += -I/usr/local/include
+ 
+-LIBS := \
++LIBS := $(CUSTOM_TARGET_LIBS) \
+ $(TARGET_NSYNC_LIB) \
+ -lstdc++ \
+ -lprotobuf \
+@@ -623,7 +623,7 @@ BENCHMARK_OBJS := $(addprefix $(OBJDIR), $(BENCHMARK_SRCS:.cc=.o))
+ .PHONY: clean cleantarget
+ 
+ # The target that's compiled if there's no command-line arguments.
+-all: $(LIB_PATH) $(BENCHMARK_NAME)
++all: $(LIB_PATH)
+ 
+ # Rules for target compilation.
+ 

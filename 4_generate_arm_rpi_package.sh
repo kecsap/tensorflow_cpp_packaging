@@ -30,7 +30,7 @@ DATE=$(git log -1 --date=short --pretty=format:%cd | tr -d '-')
 cd $DIR/packaging
 rm -rf debian/.debhelper debian/tensorflow-cpp-*
 rm -rf debian/debhelper-build-stamp debian/files
-cmake . -DGIT_TAG=${TAG} -DGIT_COMMIT=${COMMIT} -DGIT_DATE=${DATE} -DPKG_SUFFIX=optimized -DCMAKE_INSTALL_PREFIX=/usr -DPKG_ARCH=amd64 -DRELEASE_MODE=OFF
-dpkg-buildpackage -rfakeroot -b -nc
+cmake . -DGIT_TAG=${TAG} -DGIT_COMMIT=${COMMIT} -DGIT_DATE=${DATE} -DPKG_SUFFIX=rpi -DCMAKE_INSTALL_PREFIX=/usr -DPKG_ARCH=armhf -DRELEASE_MODE=OFF
+dpkg-buildpackage -rfakeroot -b -nc -a armhf
 
-echo READY! Optimized x86_64 package is generated!
+echo READY! Arm package for Raspberry Pi is generated!

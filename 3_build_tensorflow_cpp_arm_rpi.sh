@@ -20,7 +20,7 @@ cd $DIR/tensorflow
 git clean -fdx
 git reset --hard
 cat $DIR/tf_tensor_fix.txt >> tensorflow/contrib/makefile/tf_op_files.txt
-git apply < $DIR/tf_optimized_x86_64.patch || exit 1
+git apply < $DIR/tf_arm.patch || exit 1
 
 # Download the dependencies
 tensorflow/contrib/makefile/download_dependencies.sh || exit 1
@@ -28,6 +28,9 @@ tensorflow/contrib/makefile/download_dependencies.sh || exit 1
 # Build the shared library
 export CXX=g++-6
 export CC=gcc-6
+export HOST_OS=PI
+export TARGET=PI
+export JOB_COUNT=2
 tensorflow/contrib/makefile/build_all_linux.sh || exit 1
 
 # Copy/prepare the final binaries
