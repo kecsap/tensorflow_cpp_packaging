@@ -8,7 +8,7 @@
 # Status
 - It does not work.
 
-In details
+### In details
 - I tested the system with a simple CNN network what I trained with tflearn.
 - I used the same images to verify the network in Python and C++.
 - Ubuntu 64 bit: The snapshot can be loaded in C++, but the accuracy is worse than loading the same snapshot in Python. I see degraded accuracy from 98 % -> 90 %.
