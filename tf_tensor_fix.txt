@@ -3,4 +3,3 @@ tensorflow/core/kernels/random_op.cc
 tensorflow/core/kernels/l2loss_op.cc
 tensorflow/core/ops/bitwise_ops.cc
 tensorflow/core/ops/lookup_ops.cc
-tensorflow/core/ops/audio_ops.cc
