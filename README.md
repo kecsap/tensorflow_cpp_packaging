@@ -2,12 +2,14 @@
 
 - The build is based on the "TensorFlow Makefile" component in tensorflow/contrib/makefile directory.
 - Two targets were tested: Ubuntu Xenial (x86_64) and Raspberry Pi (armhf).
+- Both static and shared Tensorflow libraries. The choice is on your side.
+- Only CPU can be used for inference.
 - Debian packages are generated from the built binary files for distribution.
 - The build contains e.g. the C++ API to load model "snapshots". New ops can be easily added by modifying the [tf_tensor_fix.txt](tf_tensor_fix.txt).
 
 ## Status
 
-- I trained a simple CNN model with TFLearn and the inference works on Ubuntu and Raspberry Pi, however, there are differences in the accuracies:
+I trained a simple CNN model with TFLearn for a 2-label classification and the inference works on Ubuntu and Raspberry Pi, however, there are differences in the accuracies:
 
 | Platform         | Class 1 | Class 2 |
 |------------------|:-------:|:-------:|
@@ -21,7 +23,9 @@ These results are generated with the same frozen graph (.pb file). As you can se
 
 - You can download the releases from [here](https://github.com/kecsap/tensorflow_cpp_packaging/releases/latest).
 
-## Requirements
+## Manual compilation
+
+### Requirements
 
 - Basic dependencies must be installed like make, g++, cmake...:
 ```
@@ -31,7 +35,7 @@ sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3
    
 - The cross-compiled binary for Raspberry does not work, it crashes, therefore, Tensorflow must be compiled natively on the Raspberry Pi. It takes a lot time (6-8 hours?), but extra swap space is not necessary. I restricted the build process to 2 parallel jobs to avoid unresponsive Raspberry Pi because of running out of memory.
 
-## Manual compilation
+### Compilation steps
 
 - Clone this repository and enter to its directory:
 ```
@@ -110,6 +114,26 @@ Use the provided utility script in this repository at [utils/tf_freezer.py](http
 ./tf_freezer.py -c my_checkpoint -p final_model.pb -i Input/X -o Fc2/Sigmoid
 ```
 The above example assumes that you have three files related to a checkpoint inside the directory with my_checkpoint prefix (e.g. my_checkpoint.meta). The script will create a frozen protobuf model (final_model.pb). You must specify the input and output tensors with -i and -o. The default input tensor name is Input/X and the default output tensor name is FullyConnected/Sigmoid.
+
+## CMake support
+
+CMake support is provided to support Tensorflow inference in your C++ project.
+
+```
+# Find tensorflow-cpp
+FIND_PACKAGE(TensorFlowCpp REQUIRED PATHS /usr/lib/cmake/tensorflow-cpp)
+
+# Add the tensorflow-cpp paths to the include directories
+INCLUDE_DIRECTORIES(${TENSORFLOWCPP_INCLUDE_DIRS})
+
+# Add a target with your inference codes
+ADD_EXECUTABLE(my_nice_app my_nice_app.cpp)
+
+# Link your application against the shared Tensorflow C++ library
+TARGET_LINK_LIBRARIES(my_nice_app ${TENSORFLOWCPP_LIBRARIES})
+# OR link your application against the static Tensorflow C++ library
+#TARGET_LINK_LIBRARIES(my_nice_app ${TENSORFLOWCPP_STATIC_LIBRARIES})
+```
 
 ## Load a checkpoint in C++
 
