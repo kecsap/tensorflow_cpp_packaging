@@ -33,7 +33,8 @@ sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt
 ```
 git clone https://github.com/kecsap/tensorflow_cpp_packaging && cd tensorflow_cpp_packaging
 ```
-- Clone the Tensorflow Github repository:
+- Clone the Tensorflow Github repository.
+Latest master:
 ```
 ./1_clone_tensorflow.sh
 ```
@@ -71,6 +72,32 @@ Raspberry Pi build:
 ```
 ./4_generate_arm_rpi_package.sh
 ```
+## Save a checkpoint (snapshot) in Python
+
+The training ops must be deleted before saving a checkpoint. I provide an example how the checkpoint can be saved inside a TFLearn callback:
+
+```
+...
+model = tflearn.DNN(network)
+
+class MonitorCallback(tflearn.callbacks.Callback):
+  # Create an other session to clone the model and avoid effecting the training process
+  with tf.Session() as second_sess:
+    # Clone the current model
+    model2 = model
+    # Delete the training ops
+    del tf.get_collection_ref(tf.GraphKeys.TRAIN_OPS)[:]
+    # Save the checkpoint
+    model2.save('checkpoint_'+str(training_state.step)+".ckpt")
+    # Write a text protobuf to have a human-readable form of the model
+    tf.train.write_graph(second_sess.graph_def, '.', 'checkpoint_'+str(training_state.step)+".pbtxt", as_text = True)
+  return
+
+mycb = MonitorCallback()
+model.fit({'input': X}, {'target': Y}, n_epoch=500, run_id="mymodel", callbacks=mycb)
+...
+```
+            
 
 ## Conclusion
 - The tensorflow/contrib/makefile is not really tested officially, only some demos were run on iOS/Android. If you don't mind the minor differences in performance, it is suitable for you.
