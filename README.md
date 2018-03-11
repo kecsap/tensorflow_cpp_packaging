@@ -72,9 +72,9 @@ Raspberry Pi build:
 ```
 ./4_generate_arm_rpi_package.sh
 ```
-## Save a checkpoint (snapshot) in Python
+## Save a checkpoint in Python (TFLearn)
 
-The training ops must be deleted before saving a checkpoint. I provide an example how the checkpoint can be saved inside a TFLearn callback:
+The standard, saved checkpoints in TFLearn are not good because they contain the training ops and those must be deleted before saving a checkpoint. I provide an example how the checkpoints can be saved inside a TFLearn callback:
 
 ```
 ...
