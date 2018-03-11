@@ -117,7 +117,7 @@ The above example assumes that you have three files related to a checkpoint insi
 
 ## CMake support
 
-CMake support is provided to support Tensorflow inference in your C++ project.
+Once you installed the Debian package of this project, CMake support is provided for Tensorflow inference in your C++ project.
 
 ```
 # Find tensorflow-cpp
