@@ -114,7 +114,6 @@ The above example assumes that you have three files related to a checkpoint insi
 ## Load a checkpoint in C++
 
 ```
-...
 #include <tensorflow/core/protobuf/meta_graph.pb.h>
 #include <tensorflow/core/public/session.h>
 
@@ -166,6 +165,45 @@ void LoadGraph()
   if (!Status.ok())
   {
     printf("Error loading checkpoint from %s: %s\n", CheckpointPrefix.c_str(), Status.ToString().c_str());
+    return false;
+  }
+}
+```
+
+## Load a frozen model in C++
+
+Loading a frozen model is much more simple than loading a checkpoint:
+```
+#include <tensorflow/core/protobuf/meta_graph.pb.h>
+#include <tensorflow/core/public/session.h>
+
+tensorflow::MetaGraphDef GraphDef;
+tensorflow::Session* Session = nullptr;
+
+void LoadGraph()
+{
+  // Read in the protobuf graph we exported
+  tensorflow::Status Status;
+
+  Status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), "my_model.pb"), &GraphDef);
+  if (!Status.ok())
+  {
+    printf("Error reading graph definition from %s: %s\n", "my_model.pb", Status.ToString().c_str());
+    return false;
+  }
+
+  Session = tensorflow::NewSession(tensorflow::SessionOptions());
+  if (Session == nullptr)
+  {
+    printf("Could not create Tensorflow session.\n");
+    return false;
+  }
+
+  // Add the graph to the session
+  Status = Session->Create(GraphDef);
+  if (!Status.ok())
+  {
+    printf("Error creating graph: %s\n", Status.ToString().c_str());
     return false;
   }
 }
