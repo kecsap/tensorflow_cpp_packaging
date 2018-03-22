@@ -209,7 +209,7 @@ void LoadGraph()
   // Read in the protobuf graph we exported
   tensorflow::Status Status;
 
-  Status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), "my_model.pb"), &GraphDef);
+  Status = tensorflow::ReadBinaryProto(tensorflow::Env::Default(), "my_model.pb", &GraphDef);
   if (!Status.ok())
   {
     printf("Error reading graph definition from %s: %s\n", "my_model.pb", Status.ToString().c_str());
