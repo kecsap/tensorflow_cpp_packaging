@@ -201,7 +201,7 @@ Loading a frozen model is much more simple than loading a checkpoint:
 #include <tensorflow/core/protobuf/meta_graph.pb.h>
 #include <tensorflow/core/public/session.h>
 
-tensorflow::MetaGraphDef GraphDef;
+tensorflow::GraphDef GraphDef;
 tensorflow::Session* Session = nullptr;
 
 void LoadGraph()
