@@ -3,3 +3,8 @@ tensorflow/core/kernels/random_op.cc
 tensorflow/core/kernels/l2loss_op.cc
 tensorflow/core/ops/bitwise_ops.cc
 tensorflow/core/ops/lookup_ops.cc
+
+tensorflow/c/c_api.cc
+tensorflow/cc/framework/scope.cc
+tensorflow/cc/framework/ops.cc
+tensorflow/core/framework/op_gen_lib.cc

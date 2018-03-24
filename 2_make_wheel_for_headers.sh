@@ -12,9 +12,10 @@ fi
 # Generate wheel (Python package) to get the C++ headers
 #
 
-mkdir -p $DIR/packaging/headers
+mkdir -p $DIR/packaging/headers/
 # Clean old packaging files if they exist
 rm -rf $DIR/packaging/headers/*
+mkdir -p $DIR/packaging/headers/tensorflow/c
 rm -rf /tmp/tensorflow_pkg/*
 
 # Comment the following lines to disable python3 and CUDA support
@@ -30,6 +31,7 @@ yes '' | ./configure || exit 1
 # Build a generic wheel package
 bazel build -c opt --copt=-mfpmath=both --copt=-march=core2 --copt=-msse4.2 --copt=-mavx --copt=-mfma -k //tensorflow/tools/pip_package:build_pip_package
 bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+cp tensorflow/c/c_api.h $DIR/packaging/headers/tensorflow/c/
 cd /tmp/tensorflow_pkg/
 unzip *.whl
 cd tensorflow-*.data

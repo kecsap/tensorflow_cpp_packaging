@@ -11,3 +11,57 @@ index a440633..240000a 100755
 +  OPTFLAGS="-Os -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize" \
 +  HOST_CXXFLAGS="--std=c++11 -Os -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize" \
    MAKEFILE_DIR=$SCRIPT_DIR
+diff --git a/tensorflow/contrib/makefile/Makefile b/tensorflow/contrib/makefile/Makefile
+index 05e8d90..8e09316 100644
+--- a/tensorflow/contrib/makefile/Makefile
++++ b/tensorflow/contrib/makefile/Makefile
+@@ -172,7 +172,8 @@ INCLUDES := \
+ -I$(MAKEFILE_DIR)/downloads/nsync/public \
+ -I$(MAKEFILE_DIR)/downloads/fft2d \
+ -I$(PROTOGENDIR) \
+--I$(PBTGENDIR)
++-I$(PBTGENDIR) \
++-I$(MAKEFILE_DIR)/../../../packaging/headers/
+ ifeq ($(HAS_GEN_HOST_PROTOC),true)
+ 	INCLUDES += -I$(MAKEFILE_DIR)/gen/protobuf-host/include
+ endif
+diff --git a/tensorflow/c/c_api.cc b/tensorflow/c/c_api.cc
+index 18eeb28..05c3ce6 100644
+--- a/tensorflow/c/c_api.cc
++++ b/tensorflow/c/c_api.cc
+@@ -2325,7 +2325,7 @@ TF_WhileParams TF_NewWhile(TF_Graph* g, TF_Output* inputs, int ninputs,
+ #endif  // __ANDROID__
+ }
+ 
+-#ifndef __ANDROID__
++#if !defined(__ANDROID__) && !defined(IS_SLIM_BUILD)
+ namespace {
+ 
+ // TODO(skyewm): make nodes in while loop unfetchable like in Python version
+@@ -2404,7 +2404,7 @@ void TF_FinishWhileHelper(const TF_WhileParams* params, TF_Status* status,
+ 
+ void TF_FinishWhile(const TF_WhileParams* params, TF_Status* status,
+                     TF_Output* outputs) {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(IS_SLIM_BUILD)
+   status->status = tensorflow::errors::Unimplemented(
+       "Creating while loops is not supported in Android. File a bug at "
+       "https://github.com/tensorflow/tensorflow/issues if this feature is "
+@@ -2421,7 +2421,7 @@ void TF_AbortWhile(const TF_WhileParams* params) { FreeWhileResources(params); }
+ 
+ void TF_AddGradients(TF_Graph* g, TF_Output* y, int ny, TF_Output* x, int nx,
+                      TF_Output* dx, TF_Status* status, TF_Output* dy) {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(IS_SLIM_BUILD)
+   status->status = tensorflow::errors::Unimplemented(
+       "Adding gradients is not supported in Android. File a bug at "
+       "https://github.com/tensorflow/tensorflow/issues if this feature is "
+@@ -2491,7 +2491,7 @@ TF_Session* TF_LoadSessionFromSavedModel(
+     TF_Graph* graph, TF_Buffer* meta_graph_def, TF_Status* status) {
+ // TODO(ashankar): Remove the __ANDROID__ guard. This will require ensuring that
+ // the tensorflow/cc/saved_model:loader build target is Android friendly.
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(IS_SLIM_BUILD)
+   status->status = tensorflow::errors::Unimplemented(
+       "Loading a SavedModel is not supported in Android. File a bug at "
+       "https://github.com/tensorflow/tensorflow/issues if this feature is "
