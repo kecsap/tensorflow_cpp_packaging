@@ -30,7 +30,7 @@ export CXX=g++-6
 export CC=gcc-6
 export HOST_OS=PI
 export TARGET=PI
-export JOB_COUNT=2
+export JOB_COUNT=1
 tensorflow/contrib/makefile/build_all_linux.sh || exit 1
 
 # Copy/prepare the final binaries
