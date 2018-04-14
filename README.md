@@ -1,11 +1,11 @@
-# Tensorflow C++ inference with Debian packages on Ubuntu x86_64 and Raspberry Pi
+# Tensorflow C/C++ inference with Debian packages on Ubuntu x86_64 and Raspberry Pi
 
 - The build is based on the "TensorFlow Makefile" component in tensorflow/contrib/makefile directory.
 - Two targets were tested: Ubuntu Xenial (x86_64) and Raspberry Pi (armhf).
 - Both static and shared Tensorflow libraries. The choice is on your side.
 - Only CPU can be used for inference.
 - Debian packages are generated from the built binary files for distribution.
-- The build contains e.g. the C++ API to load model "snapshots". New ops can be easily added by modifying the [tf_tensor_fix.txt](tf_tensor_fix.txt).
+- The build contains e.g. the C/C++ API to load model "snapshots". New ops can be easily added by modifying the [tf_tensor_fix.txt](tf_tensor_fix.txt).
 
 ## Status
 
@@ -13,11 +13,11 @@ I trained a simple CNN model with TFLearn for a 2-label classification and the i
 
 | Platform         | Class 1 | Class 2 |
 |------------------|:-------:|:-------:|
-| Python           | 94.75 % | 90.12 % |
-| Ubuntu C++       | 92.79 % | 91.32 % |
-| Raspberry Pi C++ | 90.02 % | 88.46 % |
+| Python           | 95.26 % | 95.69 % |
+| Ubuntu C/C++     | 95.12 % | 95.57 % |
+| Raspberry Pi C++ | 97.23 % | 83.73 % |
 
-These results are generated with the same frozen graph (.pb file). As you can see, the C++ inference does not provide 100 % reproducible results vs. the Python inference.
+These results are generated with the same frozen graph (.pb file). As you can see, the C/C++ inference does not provide 100 % reproducible results vs. the Python inference.
 
 ## Releases
 
