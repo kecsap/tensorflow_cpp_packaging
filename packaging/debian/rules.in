@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+%:
+	dh $@
+
+build:
+	cmake . -DCMAKE_INSTALL_PREFIX=/usr -DRELEASE_MODE=ON
+
+install:
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
+
+override_dh_clean:
+	if [ -e "CMakeCache.txt" ] ; then \
+		rm CMakeCache.txt; \
+	fi;
+	dh_clean
+
+override_dh_strip:
+
+override_dh_usrlocal:
+
+override_dh_shlibdeps:

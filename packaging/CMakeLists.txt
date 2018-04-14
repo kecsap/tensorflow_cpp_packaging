@@ -45,6 +45,7 @@ IF (NOT RELEASE_MODE)
   CONFIGURE_FILE(TensorFlowCppConfigVersion.cmake.in TensorFlowCppConfigVersion.cmake @ONLY)
   CONFIGURE_FILE(debian/changelog.in debian/changelog @ONLY)
   CONFIGURE_FILE(debian/control.in debian/control @ONLY)
+  CONFIGURE_FILE(debian/rules.in debian/rules @ONLY)
 ENDIF ()
 
 INSTALL(DIRECTORY headers/Eigen headers/external headers/google headers/tensorflow headers/third_party headers/unsupported
