@@ -274,6 +274,104 @@ void Predict()
 }
 ```
 
+## Load a frozen model in C
+
+Loading a frozen model is with the C API:
+```
+#include <tensorflow/c/c_api.h>
+
+TF_Status* Status = NULL;
+TF_Graph* Graph = NULL;
+TF_ImportGraphDefOptions* GraphDefOpts = NULL;
+TF_Session* Session = NULL;
+TF_SessionOptions* SessionOpts = NULL;
+TF_Buffer* GraphDef = NULL;
+
+void LoadGraph()
+{
+  // The protobuf is loaded with C API here
+  unsigned char CurrentFile[YOUR_BUFFER_SIZE];
+  
+  LOAD YOUR PROTOBUF FILE HERE TO CurrentFile
+
+  Status = TF_NewStatus();
+  Graph = TF_NewGraph();
+  GraphDef.reset(TF_NewBuffer());
+  GraphDef->data = &CurrentFile;
+  GraphDef->length = YOUR_BUFFER_SIZE;
+  // Deallocator is skipped in this example
+  GraphDef->data_deallocator = nullptr;
+  GraphDefOpts = TF_NewImportGraphDefOptions();
+  TF_GraphImportGraphDef(Graph, GraphDef.get(), GraphDefOpts, Status);
+  if (TF_GetCode(Status) != TF_OK)
+  {
+    printf("Tensorflow status %d - %s\n", TF_GetCode(Status), TF_Message(Status));
+    return false;
+  }
+  SessionOpts = TF_NewSessionOptions();
+  Session = TF_NewSession(Graph, SessionOpts, Status);
+  if (TF_GetCode(Status) != TF_OK)
+  {
+    printf("Tensorflow status %d - %s\n", TF_GetCode(Status), TF_Message(Status));
+    return false;
+  }
+}
+```
+
+## Inference in C
+
+```
+void Predict()
+{
+  // Make prediction with C API
+  float* InputData = (float*)malloc(sizeof(float)*96*160);
+
+  for (int i = 0; i < image.GetImageDataSize(); ++i)
+  {
+    InputData[i] = (float)YOUR_PIXELS;
+  }
+
+  // Input node
+  int64_t InputDim[] = { 1, 96, 160, 1 };
+  TF_Tensor* ImageTensor = TF_NewTensor(TF_FLOAT, InputDim, 4, InputData, 96*160*sizeof(float), NULL, NULL);
+  TF_Output Input = { TF_GraphOperationByName(Graph, "YOUR_INPUT_TENSOR") };
+  TF_Tensor* InputValues[] = { ImageTensor };
+
+  // Output node
+  TF_Output Output = { TF_GraphOperationByName(Graph, "YOUR_OUTPUT_TENSOR") };
+  TF_Tensor* OutputValues = NULL;
+
+  // Run prediction
+  TF_SessionRun(Session, NULL,
+                &Input, &InputValues[0], 1,
+                &Output, &OutputValues, 1,
+                nullptr, 0, NULL, Status);
+
+  delete InputData;
+  InputData = NULL;
+  if (TF_GetCode(Status) != TF_OK)
+  {
+    printf("Tensorflow status %d - %s\n", TF_GetCode(Status), TF_Message(Status));
+    return false;
+  }
+  // This example has a final in argmax classification.
+  int Result = (int)*(long long*)TF_TensorData(OutputValues);
+  
+  printf("Argmax output: %d\n", Result);
+}
+```
+
+Remember to release the allocated resources in the end:
+
+```
+  TF_DeleteGraph(Graph);
+  TF_DeleteSession(Session, Status);
+  TF_DeleteSessionOptions(SessionOpts);
+  TF_DeleteStatus(Status);
+  TF_DeleteImportGraphDefOptions(GraphDefOpts);
+```
+
+
 
 ## Conclusion
 - The tensorflow/contrib/makefile is not really tested officially, only some demos were run on iOS/Android. If you don't mind the minor differences in performance, it is suitable for you.
