@@ -300,7 +300,7 @@ void LoadGraph()
   GraphDef->data = &CurrentFile;
   GraphDef->length = YOUR_BUFFER_SIZE;
   // Deallocator is skipped in this example
-  GraphDef->data_deallocator = nullptr;
+  GraphDef->data_deallocator = NULL;
   GraphDefOpts = TF_NewImportGraphDefOptions();
   TF_GraphImportGraphDef(Graph, GraphDef.get(), GraphDefOpts, Status);
   if (TF_GetCode(Status) != TF_OK)
@@ -345,7 +345,7 @@ void Predict()
   TF_SessionRun(Session, NULL,
                 &Input, &InputValues[0], 1,
                 &Output, &OutputValues, 1,
-                nullptr, 0, NULL, Status);
+                NULL, 0, NULL, Status);
 
   delete InputData;
   InputData = NULL;
