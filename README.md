@@ -3,7 +3,7 @@
 - The build is based on the "TensorFlow Makefile" component in tensorflow/contrib/makefile directory.
 - Two targets were tested: Ubuntu Xenial (x86_64) and Raspberry Pi (armhf).
 - Both static and shared Tensorflow libraries. The choice is on your side.
-- Only CPU can be used for inference.
+- Only CPU can be used for inference. No GPU support.
 - Debian packages are generated from the built binary files for distribution.
 - The build contains e.g. the C/C++ API to load model "snapshots". New ops can be easily added by modifying the [tf_tensor_fix.txt](tf_tensor_fix.txt).
 
