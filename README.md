@@ -29,7 +29,7 @@ These results are generated with the same frozen graph (.pb file). As you can se
 
 - Basic dependencies must be installed like make, g++, cmake...:
 ```
-sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool
+sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot
 ```
    Note: Gcc 6 is needed for the build process because gcc 5 has a linking bug and Tensorflow does not compile with the shipped gcc 5 in Ubuntu Xenial. Gcc 6 can be installed from [this PPA](https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test).
    
