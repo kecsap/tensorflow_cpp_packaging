@@ -1,0 +1,248 @@
+diff --git a/tensorflow/c/eager/c_api.cc b/tensorflow/c/eager/c_api.cc
+index dfb1c9a376..248ed67450 100644
+--- a/tensorflow/c/eager/c_api.cc
++++ b/tensorflow/c/eager/c_api.cc
+@@ -36,9 +36,9 @@ limitations under the License.
+ #include "tensorflow/core/common_runtime/eager/execute.h"
+ #include "tensorflow/core/common_runtime/function.h"
+ #include "tensorflow/core/common_runtime/rendezvous_mgr.h"
+-#include "tensorflow/core/distributed_runtime/rpc/eager/grpc_eager_client.h"
+-#include "tensorflow/core/distributed_runtime/rpc/grpc_channel.h"
+-#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
++//#include "tensorflow/core/distributed_runtime/rpc/eager/grpc_eager_client.h"
++//#include "tensorflow/core/distributed_runtime/rpc/grpc_channel.h"
++//#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
+ #include "tensorflow/core/distributed_runtime/server_lib.h"
+ #include "tensorflow/core/distributed_runtime/worker_env.h"
+ #include "tensorflow/core/framework/node_def_util.h"
+@@ -167,6 +167,7 @@ tensorflow::Status UpdateTFE_ContextWithServerDef(
+     }                                                   \
+   } while (0);
+ 
++#if 0
+   string worker_name =
+       tensorflow::strings::StrCat("/job:", server_def.job_name(),
+                                   "/replica:0/task:", server_def.task_index());
+@@ -229,6 +230,7 @@ tensorflow::Status UpdateTFE_ContextWithServerDef(
+                                 std::move(remote_device_mgr), remote_contexts,
+                                 r, device_mgr, keep_alive_secs);
+ 
++#endif
+   return tensorflow::Status::OK();
+ #undef LOG_AND_RETURN_IF_ERROR
+ }
+diff --git a/tensorflow/c/eager/c_api_internal.h b/tensorflow/c/eager/c_api_internal.h
+index a5c0681e2e..40e26885ba 100644
+--- a/tensorflow/c/eager/c_api_internal.h
++++ b/tensorflow/c/eager/c_api_internal.h
+@@ -39,10 +39,10 @@ limitations under the License.
+ #include "tensorflow/core/common_runtime/rendezvous_mgr.h"
+ #include "tensorflow/core/distributed_runtime/eager/eager_client.h"
+ #include "tensorflow/core/distributed_runtime/remote_device.h"
+-#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
+-#include "tensorflow/core/distributed_runtime/rpc/grpc_worker_cache.h"
+-#include "tensorflow/core/distributed_runtime/rpc/grpc_worker_service.h"
+-#include "tensorflow/core/distributed_runtime/rpc/rpc_rendezvous_mgr.h"
++//#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
++//#include "tensorflow/core/distributed_runtime/rpc/grpc_worker_cache.h"
++//#include "tensorflow/core/distributed_runtime/rpc/grpc_worker_service.h"
++//#include "tensorflow/core/distributed_runtime/rpc/rpc_rendezvous_mgr.h"
+ #include "tensorflow/core/distributed_runtime/server_lib.h"
+ #include "tensorflow/core/distributed_runtime/worker_env.h"
+ #include "tensorflow/core/framework/rendezvous.h"
+diff --git a/tensorflow/contrib/cmake/tf_core_framework.cmake b/tensorflow/contrib/cmake/tf_core_framework.cmake
+index 067c299a71..51338eb082 100644
+--- a/tensorflow/contrib/cmake/tf_core_framework.cmake
++++ b/tensorflow/contrib/cmake/tf_core_framework.cmake
+@@ -49,7 +49,7 @@ function(RELATIVE_PROTOBUF_GENERATE_CPP SRCS HDRS ROOT_DIR)
+   set(${HDRS} ${${HDRS}} PARENT_SCOPE)
+ endfunction()
+ 
+-if(NOT WIN32)
++if(NOT WIN32 AND tensorflow_ENABLE_GRPC_SUPPORT)
+   function(RELATIVE_PROTOBUF_GENERATE_GRPC_CPP SRCS HDRS ROOT_DIR)
+     if(NOT ARGN)
+       message(SEND_ERROR "Error: RELATIVE_PROTOBUF_GENERATE_GRPC_CPP() called without any proto files")
+@@ -178,12 +178,12 @@ RELATIVE_PROTOBUF_TEXT_GENERATE_CPP(PROTO_TEXT_SRCS PROTO_TEXT_HDRS
+ if(WIN32)
+   add_library(tf_protos_cc ${PROTO_SRCS} ${PROTO_HDRS})
+ else()
+-  file(GLOB_RECURSE tf_protos_grpc_cc_srcs RELATIVE ${tensorflow_source_dir}
+-      "${tensorflow_source_dir}/tensorflow/core/debug/*.proto"
+-  )
+-  RELATIVE_PROTOBUF_GENERATE_GRPC_CPP(PROTO_GRPC_SRCS PROTO_GRPC_HDRS
+-      ${tensorflow_source_dir} ${tf_protos_grpc_cc_srcs}
+-  )
++#  file(GLOB_RECURSE tf_protos_grpc_cc_srcs RELATIVE ${tensorflow_source_dir}
++#      "${tensorflow_source_dir}/tensorflow/core/debug/*.proto"
++#  )
++#  RELATIVE_PROTOBUF_GENERATE_GRPC_CPP(PROTO_GRPC_SRCS PROTO_GRPC_HDRS
++#      ${tensorflow_source_dir} ${tf_protos_grpc_cc_srcs}
++#  )
+   add_library(tf_protos_cc ${PROTO_GRPC_SRCS} ${PROTO_GRPC_HDRS} ${PROTO_SRCS} ${PROTO_HDRS})
+ endif()
+ 
+diff --git a/tensorflow/contrib/cmake/tf_shared_lib.cmake b/tensorflow/contrib/cmake/tf_shared_lib.cmake
+index fdf522f1fd..1352033c2e 100644
+--- a/tensorflow/contrib/cmake/tf_shared_lib.cmake
++++ b/tensorflow/contrib/cmake/tf_shared_lib.cmake
+@@ -64,7 +64,7 @@ endif(WIN32)
+ 
+ # tensorflow is a shared library containing all of the
+ # TensorFlow runtime and the standard ops and kernels.
+-add_library(tensorflow SHARED
++add_library(tensorflow STATIC
+     $<TARGET_OBJECTS:tf_c>
+     $<TARGET_OBJECTS:tf_cc>
+     $<TARGET_OBJECTS:tf_cc_framework>
+@@ -108,9 +108,9 @@ install(TARGETS tensorflow EXPORT tensorflow_export
+         LIBRARY DESTINATION lib
+         ARCHIVE DESTINATION lib)
+         
+-install(EXPORT tensorflow_export
+-        FILE TensorflowConfig.cmake
+-        DESTINATION lib/cmake)
++#install(EXPORT tensorflow_export
++#        FILE TensorflowConfig.cmake
++#        DESTINATION lib/cmake)
+ 
+ # install necessary headers
+ # tensorflow headers
+diff --git a/tensorflow/core/debug/debug_io_utils.cc b/tensorflow/core/debug/debug_io_utils.cc
+index 9e8002d490..01f45821dd 100644
+--- a/tensorflow/core/debug/debug_io_utils.cc
++++ b/tensorflow/core/debug/debug_io_utils.cc
+@@ -23,10 +23,10 @@ limitations under the License.
+ #include <vector>
+ 
+ #ifndef PLATFORM_WINDOWS
+-#include "grpcpp/create_channel.h"
++//#include "grpcpp/create_channel.h"
+ #else
+ // winsock2.h is used in grpc, so Ws2_32.lib is needed
+-#pragma comment(lib, "Ws2_32.lib")
++//#pragma comment(lib, "Ws2_32.lib")
+ #endif  // #ifndef PLATFORM_WINDOWS
+ 
+ #include "tensorflow/core/debug/debug_callback_registry.h"
+@@ -238,7 +238,7 @@ string AppendTimestampToFilePath(const string& in, const uint64 timestamp) {
+   return out;
+ }
+ 
+-#ifndef PLATFORM_WINDOWS
++#if 0
+ // Publishes encoded GraphDef through a gRPC debugger stream, in chunks,
+ // conforming to the gRPC message size limit.
+ Status PublishEncodedGraphDefInChunks(const string& encoded_graph_def,
+@@ -369,7 +369,7 @@ Status DebugIO::PublishDebugMetadata(
+   Status status;
+   for (const string& url : debug_urls) {
+     if (str_util::Lowercase(url).find(kGrpcURLScheme) == 0) {
+-#ifndef PLATFORM_WINDOWS
++#if 0
+       Event grpc_event;
+ 
+       // Determine the path (if any) in the grpc:// URL, and add it as a field
+@@ -387,7 +387,7 @@ Status DebugIO::PublishDebugMetadata(
+       status.Update(
+           DebugGrpcIO::SendEventProtoThroughGrpcStream(grpc_event, url, true));
+ #else
+-      GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
++//      GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
+ #endif
+     } else if (str_util::Lowercase(url).find(kFileURLScheme) == 0) {
+       const string dump_root_dir = url.substr(strlen(kFileURLScheme));
+@@ -425,7 +425,7 @@ Status DebugIO::PublishDebugTensor(const DebugNodeKey& debug_node_key,
+         fail_statuses.push_back(s);
+       }
+     } else if (str_util::Lowercase(url).find(kGrpcURLScheme) == 0) {
+-#ifndef PLATFORM_WINDOWS
++#if 0
+       Status s = DebugGrpcIO::SendTensorThroughGrpcStream(
+           debug_node_key, tensor, wall_time_us, url, gated_grpc);
+ 
+@@ -434,7 +434,7 @@ Status DebugIO::PublishDebugTensor(const DebugNodeKey& debug_node_key,
+         fail_statuses.push_back(s);
+       }
+ #else
+-      GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
++//      GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
+ #endif
+     } else if (str_util::Lowercase(url).find(kMemoryURLScheme) == 0) {
+       const string dump_root_dir = url.substr(strlen(kMemoryURLScheme));
+@@ -498,11 +498,11 @@ Status DebugIO::PublishGraph(const Graph& graph, const string& device_name,
+       status.Update(
+           DebugFileIO::DumpEventProtoToFile(event, dump_root_dir, file_name));
+     } else if (debug_url.find(kGrpcURLScheme) == 0) {
+-#ifndef PLATFORM_WINDOWS
++#if 0
+       status.Update(PublishEncodedGraphDefInChunks(buf, device_name, now_micros,
+                                                    debug_url));
+ #else
+-      GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
++//      GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
+ #endif
+     }
+   }
+@@ -512,7 +512,7 @@ Status DebugIO::PublishGraph(const Graph& graph, const string& device_name,
+ 
+ bool DebugIO::IsCopyNodeGateOpen(
+     const std::vector<DebugWatchAndURLSpec>& specs) {
+-#ifndef PLATFORM_WINDOWS
++#if 0
+   for (const DebugWatchAndURLSpec& spec : specs) {
+     if (!spec.gated_grpc || spec.url.compare(0, strlen(DebugIO::kGrpcURLScheme),
+                                              DebugIO::kGrpcURLScheme)) {
+@@ -531,7 +531,7 @@ bool DebugIO::IsCopyNodeGateOpen(
+ 
+ bool DebugIO::IsDebugNodeGateOpen(const string& watch_key,
+                                   const std::vector<string>& debug_urls) {
+-#ifndef PLATFORM_WINDOWS
++#if 0
+   for (const string& debug_url : debug_urls) {
+     if (debug_url.compare(0, strlen(DebugIO::kGrpcURLScheme),
+                           DebugIO::kGrpcURLScheme)) {
+@@ -550,7 +550,7 @@ bool DebugIO::IsDebugNodeGateOpen(const string& watch_key,
+ 
+ bool DebugIO::IsDebugURLGateOpen(const string& watch_key,
+                                  const string& debug_url) {
+-#ifndef PLATFORM_WINDOWS
++#if 0
+   if (debug_url.find(kGrpcURLScheme) != 0) {
+     return true;
+   } else {
+@@ -563,10 +563,10 @@ bool DebugIO::IsDebugURLGateOpen(const string& watch_key,
+ 
+ Status DebugIO::CloseDebugURL(const string& debug_url) {
+   if (debug_url.find(DebugIO::kGrpcURLScheme) == 0) {
+-#ifndef PLATFORM_WINDOWS
++#if 0
+     return DebugGrpcIO::CloseGrpcStream(debug_url);
+ #else
+-    GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
++//    GRPC_OSS_WINDOWS_UNIMPLEMENTED_ERROR;
+ #endif
+   } else {
+     // No-op for non-gRPC URLs.
+@@ -670,7 +670,7 @@ Status DebugFileIO::RecursiveCreateDir(Env* env, const string& dir) {
+   }
+ }
+ 
+-#ifndef PLATFORM_WINDOWS
++#if 0
+ DebugGrpcChannel::DebugGrpcChannel(const string& server_stream_addr)
+     : server_stream_addr_(server_stream_addr),
+       url_(strings::StrCat(DebugIO::kGrpcURLScheme, server_stream_addr)) {}
+diff --git a/tensorflow/core/debug/debug_io_utils.h b/tensorflow/core/debug/debug_io_utils.h
+index c974a47051..a1132f6df3 100644
+--- a/tensorflow/core/debug/debug_io_utils.h
++++ b/tensorflow/core/debug/debug_io_utils.h
+@@ -223,7 +223,7 @@ struct hash<::tensorflow::DebugNodeKey> {
+ 
+ // TODO(cais): Support grpc:// debug URLs in open source once Python grpc
+ //   genrule becomes available. See b/23796275.
+-#ifndef PLATFORM_WINDOWS
++#if 0
+ #include "tensorflow/core/debug/debug_service.grpc.pb.h"
+ 
+ namespace tensorflow {

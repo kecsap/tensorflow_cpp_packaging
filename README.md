@@ -1,7 +1,7 @@
 # Tensorflow C/C++ inference with Debian packages on Ubuntu x86_64 and Raspberry Pi
 
 - The build is based on the "TensorFlow Makefile" component in tensorflow/contrib/makefile directory.
-- Two targets were tested: Ubuntu Xenial (x86_64) and Raspberry Pi (armhf).
+- Two targets were tested: Ubuntu Bionic (x86_64) and Raspberry Pi (armhf).
 - Both static and shared Tensorflow libraries. The choice is on your side.
 - Only CPU can be used for inference. No GPU support.
 - Debian packages are generated from the built binary files for distribution.
@@ -21,6 +21,16 @@ These results are generated with the same frozen graph (.pb file). As you can se
 
 ## Releases
 
+### Dependencies
+
+- You must install some dependencies:
+
+```
+sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-dev libpng-dev libsqlite3-dev libsnappy-dev liblmdb-dev
+```
+
+### Installation
+
 - You can download the releases from [here](https://github.com/kecsap/tensorflow_cpp_packaging/releases/latest).
 
 ## Manual compilation
@@ -29,7 +39,7 @@ These results are generated with the same frozen graph (.pb file). As you can se
 
 - Basic dependencies must be installed like make, g++, cmake...:
 ```
-sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot
+sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang
 ```
    Note: Gcc 6 is needed for the build process because gcc 5 has a linking bug and Tensorflow does not compile with the shipped gcc 5 in Ubuntu Xenial. Gcc 6 can be installed from [this PPA](https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test).
    

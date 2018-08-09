@@ -19,10 +19,10 @@ mkdir -p $DIR/packaging/headers/tensorflow/c
 rm -rf /tmp/tensorflow_pkg/*
 
 # Comment the following lines to disable python3 and CUDA support
-export TF_NEED_CUDA=True
+#export TF_NEED_CUDA=True
 export PYTHON_BIN_PATH=/usr/bin/python3
-export TF_CUDA_VERSION=9.1
-export TF_CUDA_COMPUTE_CAPABILITIES=5.0,6.1
+#export TF_CUDA_VERSION=9.2
+#export TF_CUDA_COMPUTE_CAPABILITIES=5.0,6.1
 
 # Configure
 cd $DIR/tensorflow

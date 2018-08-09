@@ -9,7 +9,7 @@ Homepage: https://www.tensorflow.org
 Package: tensorflow-cpp-@PKG_SUFFIX@
 Section: libdevel
 Architecture: @PKG_ARCH@
-Depends: cmake, ${misc:Depends}, ${shlibs:Depends}
+Depends: cmake, ${misc:Depends}, ${shlibs:Depends} @EXTRA_DEPS@
 Conflicts: @PKG_CONFLICTS@
 Replaces: @PKG_CONFLICTS@
 Description: C++ headers and binaries for Tensorflow
