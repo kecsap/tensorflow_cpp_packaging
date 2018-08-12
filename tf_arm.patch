@@ -8,8 +8,8 @@ index 1a1ab54a53..db25e45574 100644
  make -j"${JOB_COUNT}" -f tensorflow/contrib/makefile/Makefile \
 -  OPTFLAGS="-O3 -march=native" \
 -  HOST_CXXFLAGS="--std=c++11 -march=native" \
-+  OPTFLAGS="-Os -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize" \
-+  HOST_CXXFLAGS="--std=c++11 -Os -mfpu=neon-vfpv4 -funsafe-math-optimizations -ftree-vectorize" \
++  OPTFLAGS="-Os" \
++  HOST_CXXFLAGS="--std=c++11 -Os" \
    MAKEFILE_DIR=$SCRIPT_DIR
 diff --git a/tensorflow/c/c_api.cc b/tensorflow/c/c_api.cc
 index 19ccb6e71d..f6a211a81b 100644
