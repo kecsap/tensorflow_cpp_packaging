@@ -1,11 +1,12 @@
 # Tensorflow C/C++ inference with Debian packages on Ubuntu x86_64 and Raspberry Pi
 
-- The build is based on the "TensorFlow Makefile" component in tensorflow/contrib/makefile directory.
-- Two targets were tested: Ubuntu Bionic (x86_64) and Raspberry Pi (armhf).
+- The x86_64 builds are based on the "TensorFlow CMake" component in tensorflow/contrib/cmake directory.
+- The Raspberry Pi build is based on the "TensorFlow Makefile" component in tensorflow/contrib/makefile directory.
+- Two targets were tested: Ubuntu Bionic (x86_64) and Raspberry Pi Ubuntu MATE Xenial (armhf).
 - Both static and shared Tensorflow libraries. The choice is on your side.
 - Only CPU can be used for inference. No GPU support.
 - Debian packages are generated from the built binary files for distribution.
-- The build contains e.g. the C/C++ API to load model "snapshots". New ops can be easily added by modifying the [tf_tensor_fix.txt](tf_tensor_fix.txt).
+- The build contains e.g. the C/C++ API to load model "snapshots" or frozen models.
 
 ## Status
 
@@ -23,7 +24,9 @@ These results are generated with the same frozen graph (.pb file). As you can se
 
 ### Dependencies
 
-- You must install some dependencies:
+- You must install some dependencies for **Ubuntu Bionic x86_64**:
+
+*Note: You don't have to install these packages on the Raspberry Pi!*
 
 ```
 sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-dev libpng-dev libsqlite3-dev libsnappy-dev liblmdb-dev
@@ -37,13 +40,18 @@ sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-
 
 ### Requirements
 
-- Basic dependencies must be installed like make, g++, cmake...:
+- These build dependencies must be installed on **Ubuntu Bionic x86_64**:
 ```
-sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang
+sudo apt-get install make g++ cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang
+```
+
+- These build dependencies must be installed on **Raspberry Pi**:
+```
+sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot
 ```
    Note: Gcc 6 is needed for the build process because gcc 5 has a linking bug and Tensorflow does not compile with the shipped gcc 5 in Ubuntu Xenial. Gcc 6 can be installed from [this PPA](https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test).
    
-- The cross-compiled binary for Raspberry does not work, it crashes, therefore, Tensorflow must be compiled natively on the Raspberry Pi. It takes a lot time (6-8 hours?), but extra swap space is not necessary. I restricted the build process to 2 parallel jobs to avoid unresponsive Raspberry Pi because of running out of memory.
+- Tensorflow must be compiled natively on the Raspberry Pi. It takes a lot time (6-8 hours?), but extra swap space is not necessary. I restricted the build process to 2 parallel jobs to avoid unresponsive Raspberry Pi because of running out of memory.
 
 ### Compilation steps
 
@@ -60,7 +68,7 @@ Latest master:
 ```
 ./1_clone_tensorflow.sh v1.6.0
 ```
-- Make the python package to extract include files for C++. This step assumes installed CUDA 9.1, but it can be changed [here](https://github.com/kecsap/tensorflow_cpp_packaging/blob/1abf70412378198fb612307fef57c2d75cbaa03c/2_make_wheel_for_headers.sh#L20):
+- Make the python package to extract include files for C++:
 ```
 ./2_make_wheel_for_headers.sh
 ```
@@ -384,7 +392,7 @@ Remember to release the allocated resources in the end:
 
 
 ## Conclusion
-- The tensorflow/contrib/makefile is not really tested officially, only some demos were run on iOS/Android. If you don't mind the minor differences in performance, it is suitable for you.
+- The tensorflow/contrib/makefile/cmake is not really tested officially, only some demos were run on iOS/Android. If you don't mind the minor differences in performance, it is suitable for you.
 
 ## Contact
 Open an issue or drop an email: csaba.kertesz@gmail.com
