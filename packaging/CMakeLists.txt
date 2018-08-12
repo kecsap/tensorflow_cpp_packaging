@@ -37,12 +37,10 @@ IF (NOT RELEASE_MODE)
     SET(EXTRA_LIBS "-ltf_protos_cc -fopenmp -lpng16 -lsqlite3 -lsnappy -lgif -ldouble-conversion -llmdb -lre2 -lfarmhash")
     SET(EXTRA_STATIC_LIBS "")
     SET(EXTRA_DEPS ", libdouble-conversion-dev, libfarmhash-dev, libre2-dev, libgif-dev, libpng-dev, libsqlite3-dev, libsnappy-dev, liblmdb-dev")
-    SET(EXTRA_INSTALL_LIBS "libs/libtf_protos_cc.so libs/libtf_protos_cc-static.a")
   ELSE ()
     SET(EXTRA_LIBS "")
     SET(EXTRA_STATIC_LIBS "${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtf_protos_cc-static.a")
     SET(EXTRA_DEPS "")
-    SET(EXTRA_INSTALL_LIBS "")
   ENDIF ()
 
   SET(TENSORFLOWCPP_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include/tensorflow-cpp ${CMAKE_INSTALL_PREFIX}/include/tensorflow-cpp/external/nsync/public)
@@ -62,10 +60,16 @@ IF (NOT RELEASE_MODE)
   CONFIGURE_FILE(debian/rules.in debian/rules @ONLY)
 ENDIF ()
 
+IF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized")
+  SET(EXTRA_INSTALL_LIBS libs/libtf_protos_cc.so libs/libtf_protos_cc-static.a)
+ELSE ()
+  SET(EXTRA_INSTALL_LIBS "")
+ENDIF ()
+
 INSTALL(DIRECTORY headers/Eigen headers/google headers/tensorflow headers/third_party headers/unsupported
         DESTINATION ${CMAKE_INSTALL_PREFIX}/include/tensorflow-cpp)
-INSTALL(FILES libs/libnsync-tf.a libs/libprotobuf-tf.so libs/libprotobuf-tf-static.a libs/libtensorflow-core.so libs/libtensorflow-core-static.a
-        ${EXTRA_INSTALL_LIBS}
+INSTALL(FILES libs/libnsync-tf.a libs/libprotobuf-tf.so libs/libprotobuf-tf-static.a libs/libtensorflow-core.so libs/libtensorflow-core-static.a 
+        ${EXTRA_INSTALL_LIBS} 
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp)
 INSTALL(FILES TensorFlowCppConfig.cmake TensorFlowCppConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/tensorflow-cpp)
