@@ -18,19 +18,37 @@ rm -rf $DIR/packaging/headers/*
 mkdir -p $DIR/packaging/headers/tensorflow/c
 rm -rf /tmp/tensorflow_pkg/*
 
-# Comment the following lines to disable python3 and CUDA support
-#export TF_NEED_CUDA=True
+# Clean the repository
+cd $DIR/tensorflow
+git clean -fdx
+git reset --hard
+
+# Comment the following lines to disable python3
 export PYTHON_BIN_PATH=/usr/bin/python3
+pip3 install --user keras_applications
+
+# Uncomment the following lines to enable CUDA support
+#export TF_NEED_CUDA=True
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-9.2/extras/CUPTI/lib64
+#export CUDA_TOOLKIT_PATH=/usr/local/cuda-9.2
 #export TF_CUDA_VERSION=9.2
 #export TF_CUDA_COMPUTE_CAPABILITIES=5.0,6.1
+# Comment the next line and uncomment the following to enable the latest nccl support
+#export TF_NCCL_VERSION=1.3
+#export NCCL_INSTALL_PATH=/usr/
+#git apply < $DIR/tf_nccl.patch || exit 1
 
-# Configure
-cd $DIR/tensorflow
+# The build fail with the default g++-7 on Ubuntu Bionic
+export CC=gcc-6
+export CXX=g++-6
+
+export OPT_STR="--copt=-mavx --copt=-mfma"
+
 yes '' | ./configure || exit 1
 
-# Build a generic wheel package
-bazel build -c opt --copt=-mfpmath=both --copt=-march=core2 --copt=-msse4.2 --copt=-mavx --copt=-mfma -k //tensorflow/tools/pip_package:build_pip_package
-bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+# Build a wheel package
+bazel build -c opt --copt=-mfpmath=both --copt=-march=core2 --copt=-msse4.2 $OPT_STR --copt=-O3 --verbose_failures -k //tensorflow/tools/pip_package:build_pip_package || exit 1
+bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg || exit 1
 cp tensorflow/c/c_api.h $DIR/packaging/headers/tensorflow/c/
 cd /tmp/tensorflow_pkg/
 unzip *.whl
