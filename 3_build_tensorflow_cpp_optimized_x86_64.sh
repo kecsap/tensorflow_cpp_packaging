@@ -17,15 +17,15 @@ rm -rf $DIR/packaging/libs/*
 
 cd $DIR/tensorflow
 # Clean up
-#git clean -fdx
-#git reset --hard
-#git apply < $DIR/tf_base.patch || exit 1
-#git apply < $DIR/tf_optimized_x86_64.patch || exit 1
+git clean -fdx
+git reset --hard
+git apply < $DIR/tf_base.patch || exit 1
+git apply < $DIR/tf_optimized_x86_64.patch || exit 1
 
 # Build the Tensorflow
 cd tensorflow/contrib/cmake
-#cmake . -Dtensorflow_ENABLE_GRPC_SUPPORT=OFF -Dtensorflow_ENABLE_SSL_SUPPORT=OFF -Dtensorflow_BUILD_PYTHON_BINDINGS=OFF \
-#        -Dtensorflow_ENABLE_POSITION_INDEPENDENT_CODE=ON -Dtensorflow_BUILD_SHARED_LIB=ON -Dtensorflow_BUILD_CC_EXAMPLE=OFF -DCMAKE_BUILD_TYPE=Release || exit 1
+cmake . -Dtensorflow_ENABLE_GRPC_SUPPORT=OFF -Dtensorflow_ENABLE_SSL_SUPPORT=OFF -Dtensorflow_BUILD_PYTHON_BINDINGS=OFF \
+        -Dtensorflow_ENABLE_POSITION_INDEPENDENT_CODE=ON -Dtensorflow_BUILD_SHARED_LIB=ON -Dtensorflow_BUILD_CC_EXAMPLE=OFF -DCMAKE_BUILD_TYPE=Release || exit 1
 make -j8 tensorflow || exit 1
 cd ../../..
 
