@@ -40,6 +40,7 @@ sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-
 
 ### Requirements
 
+- Install Bazel: https://docs.bazel.build/versions/master/install-ubuntu.html
 - These build dependencies must be installed on **Ubuntu Bionic x86_64**:
 ```
 sudo apt-get install make g++ cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang
