@@ -163,7 +163,7 @@ TARGET_LINK_LIBRARIES(my_nice_app ${TENSORFLOWCPP_LIBRARIES})
 tensorflow::MetaGraphDef GraphDef;
 tensorflow::Session* Session = nullptr;
 
-void LoadGraph()
+bool LoadGraph()
 {
   const std::string PathToGraph = "my_checkpoint.meta";
   const std::string CheckpointPrefix = "my_checkpoint";
@@ -210,6 +210,7 @@ void LoadGraph()
     printf("Error loading checkpoint from %s: %s\n", CheckpointPrefix.c_str(), Status.ToString().c_str());
     return false;
   }
+  return true;
 }
 ```
 
@@ -223,7 +224,7 @@ Loading a frozen model is much more simple than loading a checkpoint:
 tensorflow::GraphDef GraphDef;
 tensorflow::Session* Session = nullptr;
 
-void LoadGraph()
+bool LoadGraph()
 {
   // Read in the protobuf graph we exported
   tensorflow::Status Status;
@@ -249,13 +250,14 @@ void LoadGraph()
     printf("Error creating graph: %s\n", Status.ToString().c_str());
     return false;
   }
+  return true;
 }
 ```
 
 ## Inference in C++
 
 ```
-void Predict()
+int Predict()
 {
   // The input tensor in this example is an image with resolution 160x96
   tensorflow::Tensor X(tensorflow::DT_FLOAT, tensorflow::TensorShape({ 1, 96, 160, 1 }));
@@ -290,6 +292,11 @@ void Predict()
 
   printf("First neuron output: %1.4\n", (float)Item(0, 0));
   printf("Second neuron output: %1.4\n", (float)Item(0, 1));
+  if ((float)Item(0, 0) > (float)Item(0, 1))
+  {
+    return 0;
+  }
+  return 1;
 }
 ```
 
@@ -306,7 +313,7 @@ TF_Session* Session = NULL;
 TF_SessionOptions* SessionOpts = NULL;
 TF_Buffer* GraphDef = NULL;
 
-void LoadGraph()
+bool LoadGraph()
 {
   // The protobuf is loaded with C API here
   unsigned char CurrentFile[YOUR_BUFFER_SIZE];
@@ -334,13 +341,14 @@ void LoadGraph()
     printf("Tensorflow status %d - %s\n", TF_GetCode(Status), TF_Message(Status));
     return false;
   }
+  return true;
 }
 ```
 
 ## Inference in C
 
 ```
-void Predict()
+int Predict()
 {
   // Make prediction with C API
   float* InputData = (float*)malloc(sizeof(float)*96*160);
@@ -377,6 +385,7 @@ void Predict()
   int Result = (int)*(long long*)TF_TensorData(OutputValues);
   
   printf("Argmax output: %d\n", Result);
+  return Result;
 }
 ```
 
