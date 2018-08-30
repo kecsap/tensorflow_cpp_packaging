@@ -43,7 +43,7 @@ sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-
 - Install Bazel: https://docs.bazel.build/versions/master/install-ubuntu.html
 - These build dependencies must be installed on **Ubuntu Bionic x86_64**:
 ```
-sudo apt-get install make g++ cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang
+sudo apt-get install make g++ cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang pxz
 ```
 
 - These build dependencies must be installed on **Raspberry Pi**:

@@ -34,9 +34,9 @@ IF (NOT RELEASE_MODE)
   ENDIF ()
 
   IF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized")
-    SET(EXTRA_LIBS "-ltf_protos_cc -fopenmp -lpng16 -lsqlite3 -lsnappy -lgif -ldouble-conversion -llmdb -lre2 -lfarmhash")
+    SET(EXTRA_LIBS "-ltf_protos_cc -fopenmp -lpng16 -lsqlite3 -lsnappy -lgif -ldouble-conversion -llmdb -lre2 -ljpeg -lz -lfarmhash")
     SET(EXTRA_STATIC_LIBS "")
-    SET(EXTRA_DEPS ", libdouble-conversion-dev, libfarmhash-dev, libre2-dev, libgif-dev, libpng-dev, libsqlite3-dev, libsnappy-dev, liblmdb-dev")
+    SET(EXTRA_DEPS ", libdouble-conversion-dev, libfarmhash-dev, libre2-dev, libgif-dev, libpng-dev, libsqlite3-dev, libsnappy-dev, liblmdb-dev, libjpeg-dev")
   ELSE ()
     SET(EXTRA_LIBS "")
     SET(EXTRA_STATIC_LIBS "${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtf_protos_cc-static.a")
@@ -46,8 +46,8 @@ IF (NOT RELEASE_MODE)
   SET(TENSORFLOWCPP_INCLUDE_DIRS ${CMAKE_INSTALL_PREFIX}/include/tensorflow-cpp ${CMAKE_INSTALL_PREFIX}/include/tensorflow-cpp/external/nsync/public)
 
   SET(TENSORFLOWCPP_LIBS -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp -L${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp
-      -ltensorflow-core -Wl,--no-as-needed -lprotobuf-tf -Wl,--as-needed ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libnsync-tf.a
-      ${EXTRA_LIBS} -ldl -lpthread)
+      -ltensorflow-core -Wl,--no-as-needed -lprotobuf-tf ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libnsync-tf.a
+      ${EXTRA_LIBS} -Wl,--as-needed -ldl -lpthread)
   SET(TENSORFLOWCPP_STATIC_LIBS -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp -L${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp
       -Wl,--whole-archive ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtensorflow-core-static.a ${EXTRA_STATIC_LIBS}
       ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libprotobuf-tf-static.a -Wl,--no-whole-archive ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libnsync-tf.a

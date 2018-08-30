@@ -33,4 +33,8 @@ rm -rf debian/debhelper-build-stamp debian/files
 cmake . -DGIT_TAG=${TAG} -DGIT_COMMIT=${COMMIT} -DGIT_DATE=${DATE} -DPKG_SUFFIX=generic -DCMAKE_INSTALL_PREFIX=/usr -DPKG_ARCH=amd64 -DRELEASE_MODE=OFF
 dpkg-buildpackage -rfakeroot -b -nc
 
+# Make a plain tar file
+tar -C ./debian/tensorflow-cpp-generic/ -cf ../tensorflow-cpp-generic_${TAG}~git${DATE}~${COMMIT}.tar usr/
+pxz -9 ../tensorflow-cpp-generic_${TAG}~git${DATE}~${COMMIT}.tar
+
 echo READY! Generic x86_64 package is generated!
