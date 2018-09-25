@@ -194,9 +194,7 @@ bool LoadGraph()
   }
 
   // Read weights from the saved checkpoint
-  tensorflow::Tensor 
-  
-  Tensor(tensorflow::DT_STRING, tensorflow::TensorShape());
+  tensorflow::Tensor CheckpointPathTensor(tensorflow::DT_STRING, tensorflow::TensorShape());
 
   CheckpointPathTensor.scalar<std::string>()() = CheckpointPrefix;
   Status = Session->Run(
