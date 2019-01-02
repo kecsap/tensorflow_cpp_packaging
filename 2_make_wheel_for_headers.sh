@@ -29,13 +29,13 @@ pip3 install --user keras_applications
 
 # Uncomment the following lines to enable CUDA support
 #export TF_NEED_CUDA=True
-#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-9.2/extras/CUPTI/lib64
-#export CUDA_TOOLKIT_PATH=/usr/local/cuda-9.2
-#export TF_CUDA_VERSION=9.2
-#export TF_CUDA_COMPUTE_CAPABILITIES=5.0,6.1
-# Comment the next line and uncomment the following to enable the latest nccl support
-#export TF_NCCL_VERSION=1.3
+#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.0/extras/CUPTI/lib64
+#export CUDA_TOOLKIT_PATH=/usr/local/cuda-10.0
+#export TF_CUDA_VERSION=10.0
+#export TF_CUDA_COMPUTE_CAPABILITIES=5.0,6.1,7.5
+#export TF_NCCL_VERSION=2.3.7
 #export NCCL_INSTALL_PATH=/usr/
+# NOTE! This patch is not needed anymore for Tensorflow 1.12.0
 #git apply < $DIR/tf_nccl.patch || exit 1
 
 # The build fail with the default g++-7 on Ubuntu Bionic
