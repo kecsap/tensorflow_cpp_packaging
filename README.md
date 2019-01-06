@@ -1,12 +1,13 @@
 # Tensorflow C/C++ inference with Debian packages on Ubuntu x86_64 and Raspberry Pi
 
-- The x86_64 builds are based on the "TensorFlow CMake" component in tensorflow/contrib/cmake directory.
+- The generic and optimized x86_64 builds are based on the "TensorFlow CMake" component in tensorflow/contrib/cmake directory.
+- The optimized/CUDA x86_64 build is based on [tensorflow_cc project](https://github.com/FloopCZ/tensorflow_cc), thanks to FloopCZ.
 - The Raspberry Pi build is based on the "TensorFlow Makefile" component in tensorflow/contrib/makefile directory.
 - Two targets were tested: Ubuntu Bionic (x86_64) and Raspberry Pi Ubuntu MATE Xenial (armhf).
-- Both static and shared Tensorflow libraries. The choice is on your side.
-- Only CPU can be used for inference. No GPU support.
+- Generic, optimized and Raspberry Pi packages contain both static and shared Tensorflow libraries. The choice is on your side. However, the optimized/CUDA build only ships shared libraries.
+- CPU can be used for inference, GPU support is only in the optimized/CUDA packages.
 - Debian packages are generated from the built binary files for distribution.
-- The build contains e.g. the C/C++ API to load model "snapshots" or frozen models.
+- The build contains e.g. the C/C++ API to load model "snapshots" or frozen models. Other parts of the C++ API is included, but they are untested.
 
 ## Status
 
@@ -18,11 +19,11 @@ I trained a simple CNN model with TFLearn for a 2-label classification and the i
 | Ubuntu C/C++     | 95.12 % | 95.57 % |
 | Raspberry Pi C++ | 97.23 % | 83.73 % |
 
-These results are generated with the same frozen graph (.pb file). As you can see, the C/C++ inference does not provide 100 % reproducible results vs. the Python inference.
+These results are generated with the same frozen graph (.pb file). The C/C++ inference does not provide 100 % reproducible results vs. the Python inference.
 
 ## Releases
 
-### Dependencies
+### Dependencies for generic and optimized packages
 
 - You must install some dependencies for **Ubuntu Bionic x86_64**:
 
@@ -31,6 +32,14 @@ These results are generated with the same frozen graph (.pb file). As you can se
 ```
 sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-dev libpng-dev libsqlite3-dev libsnappy-dev liblmdb-dev
 ```
+
+### Dependencies for optimized/CUDA packages
+
+You must install CUDA 10 from the official Nvidia repositories. Other configuration is not supported.
+
+### Dependencies for Raspberry Pi packages
+
+Nothing.
 
 ### Installation
 
@@ -45,7 +54,6 @@ sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-
 ```
 sudo apt-get install make g++ cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang pxz
 ```
-
 - These build dependencies must be installed on **Raspberry Pi**:
 ```
 sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot
@@ -78,9 +86,14 @@ Generic build for Ubuntu x86_64, optimized only for SSE 4.2 (post Core 2 Duo pro
 ```
 ./3_build_tensorflow_cpp_generic_x86_64.sh
 ```
-Optimized build for Ubuntu x86_64, optimized only for SSE/AVX1/FMA. AVX2 optimization was left out on purpose to be compatible with the older AMD FX processors:
+Optimized build for Ubuntu x86_64, optimized only for SSE/AVX1/FMA. AVX2 optimization was left out on purpose for compatibility with the older AMD FX processors:
 ```
 ./3_build_tensorflow_cpp_optimized_x86_64.sh
+```
+Optimized/CUDA build for Ubuntu x86_64, optimized for SSE/AVX1/FMA. The optimized build had to be compiled first to get all C++ headers correctly:
+```
+./3_build_tensorflow_cpp_optimized_x86_64.sh
+./3_build_tensorflow_cpp_optimized_cuda_x86_64.sh
 ```
 Raspberry Pi build:
 ```
@@ -94,6 +107,10 @@ Generic build for Ubuntu x86_64:
 Optimized build for Ubuntu x86_64:
 ```
 ./4_generate_optimized_x86_64_package.sh
+```
+Optimized/CUDA build for Ubuntu x86_64:
+```
+./4_generate_optimized_cuda_x86_64_package.sh
 ```
 Raspberry Pi build:
 ```
