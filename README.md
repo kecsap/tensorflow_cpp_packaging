@@ -26,9 +26,6 @@ These results are generated with the same frozen graph (.pb file). The C/C++ inf
 ### Dependencies for generic and optimized packages
 
 - You must install some dependencies for **Ubuntu Bionic x86_64**:
-
-*Note: You don't have to install these packages on the Raspberry Pi!*
-
 ```
 sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-dev libpng-dev libsqlite3-dev libsnappy-dev liblmdb-dev
 ```
@@ -58,7 +55,7 @@ sudo apt-get install make g++ cmake git dpkg-dev debhelper quilt python3 autogen
 ```
 sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot
 ```
-   Note: Gcc 6 is needed for the build process because gcc 5 has a linking bug and Tensorflow does not compile with the shipped gcc 5 in Ubuntu Xenial. Gcc 6 can be installed from [this PPA](https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test).
+   Note: Gcc 6 is needed for the build process on the Raspberry Pi because gcc 5 has a linking bug and Tensorflow does not compile with the shipped gcc 5 in Ubuntu Xenial. Gcc 6 can be installed from [this PPA](https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/test).
    
 - Tensorflow must be compiled natively on the Raspberry Pi. It takes a lot time (6-8 hours?), but extra swap space is not necessary. I restricted the build process to 2 parallel jobs to avoid unresponsive Raspberry Pi because of running out of memory.
 
