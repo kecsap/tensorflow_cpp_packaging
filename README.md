@@ -66,6 +66,7 @@ sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autog
 git clone https://github.com/kecsap/tensorflow_cpp_packaging && cd tensorflow_cpp_packaging
 ```
 - Clone the Tensorflow Github repository.
+
 Latest master:
 ```
 ./1_clone_tensorflow.sh
@@ -79,6 +80,7 @@ Latest master:
 ./2_make_wheel_for_headers.sh
 ```
 - Compile the Tensorflow C++ libraries for the desired platform:
+
 Generic build for Ubuntu x86_64, optimized only for SSE 4.2 (post Core 2 Duo processors):
 ```
 ./3_build_tensorflow_cpp_generic_x86_64.sh
@@ -97,6 +99,7 @@ Raspberry Pi build:
 ./3_build_tensorflow_cpp_arm_rpi.sh
 ```
 - Generate debian packages:
+
 Generic build for Ubuntu x86_64:
 ```
 ./4_generate_generic_x86_64_package.sh
