@@ -32,7 +32,7 @@ pip3 install --user keras_applications
 #export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.0/extras/CUPTI/lib64
 #export CUDA_TOOLKIT_PATH=/usr/local/cuda-10.0
 #export TF_CUDA_VERSION=10.0
-#export TF_CUDA_COMPUTE_CAPABILITIES=5.0,6.1,7.5
+#export TF_CUDA_COMPUTE_CAPABILITIES=5.2,6.1,7.0
 #export TF_NCCL_VERSION=2.3.7
 #export NCCL_INSTALL_PATH=/usr/
 # NOTE! This patch is not needed anymore for Tensorflow 1.12.0
