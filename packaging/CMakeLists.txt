@@ -25,12 +25,15 @@ IF (NOT RELEASE_MODE)
   ENDIF ()
 
   SET(TENSORFLOWCPP_VERSION ${GIT_TAG})
+  SET(PKG_CONFLICTS "")
   IF (${PKG_SUFFIX} STREQUAL "generic")
-    SET(PKG_CONFLICTS tensorflow-cpp-optimized,tensorflow-cpp-rpi)
+    SET(PKG_CONFLICTS tensorflow-cpp-optimized,tensorflow-cpp-rpi,tensorflow-cpp-optimized-cuda)
   ELSEIF (${PKG_SUFFIX} STREQUAL "optimized")
-    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-rpi)
+    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-rpi,tensorflow-cpp-optimized-cuda)
+  ELSEIF (${PKG_SUFFIX} STREQUAL "rpi")
+    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-optimized-cuda)
   ELSE ()
-    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-optimized)
+    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-rpi)
   ENDIF ()
 
   IF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized")
@@ -53,6 +56,13 @@ IF (NOT RELEASE_MODE)
       ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libprotobuf-tf-static.a -Wl,--no-whole-archive ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libnsync-tf.a
       ${EXTRA_LIBS} -ldl -lpthread)
 
+  # Override TENSORFLOWCPP_LIBS and TENSORFLOWCPP_STATIC_LIBS for CUDA version
+  IF (${PKG_SUFFIX} STREQUAL "optimized-cuda")
+    SET(TENSORFLOWCPP_LIBS -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp -L${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp
+      -ltensorflow_cc -Wl,--no-as-needed ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libprotobuf.a -Wl,--as-needed)
+    SET(TENSORFLOWCPP_STATIC_LIBS "")
+  ENDIF ()
+
   CONFIGURE_FILE(TensorFlowCppConfig.cmake.in TensorFlowCppConfig.cmake @ONLY)
   CONFIGURE_FILE(TensorFlowCppConfigVersion.cmake.in TensorFlowCppConfigVersion.cmake @ONLY)
   CONFIGURE_FILE(debian/changelog.in debian/changelog @ONLY)
@@ -60,16 +70,22 @@ IF (NOT RELEASE_MODE)
   CONFIGURE_FILE(debian/rules.in debian/rules @ONLY)
 ENDIF ()
 
+
 IF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized")
   SET(EXTRA_INSTALL_LIBS libs/libtf_protos_cc.so libs/libtf_protos_cc-static.a)
 ELSE ()
   SET(EXTRA_INSTALL_LIBS "")
 ENDIF ()
 
+SET(INSTALL_LIBS libs/libnsync-tf.a libs/libprotobuf-tf.so libs/libprotobuf-tf-static.a libs/libtensorflow-core.so libs/libtensorflow-core-static.a 
+    ${EXTRA_INSTALL_LIBS})
+IF (${PKG_SUFFIX} STREQUAL "optimized-cuda")
+  SET(INSTALL_LIBS libs/libprotobuf.a libs/libtensorflow_cc.so)
+ENDIF ()
+
 INSTALL(DIRECTORY headers/Eigen headers/google headers/tensorflow headers/third_party headers/unsupported
         DESTINATION ${CMAKE_INSTALL_PREFIX}/include/tensorflow-cpp)
-INSTALL(FILES libs/libnsync-tf.a libs/libprotobuf-tf.so libs/libprotobuf-tf-static.a libs/libtensorflow-core.so libs/libtensorflow-core-static.a 
-        ${EXTRA_INSTALL_LIBS} 
+INSTALL(FILES ${INSTALL_LIBS}
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp)
 INSTALL(FILES TensorFlowCppConfig.cmake TensorFlowCppConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/cmake/tensorflow-cpp)
