@@ -121,7 +121,7 @@ Raspberry Pi build:
 
 The standard, saved checkpoints in TFLearn are not good because they contain the training ops and those must be deleted before saving a checkpoint. I provide an example how the checkpoints can be saved inside a TFLearn callback:
 
-```
+```python
 ...
 model = tflearn.DNN(network)
 
@@ -146,7 +146,7 @@ model.fit({'input': X}, {'target': Y}, n_epoch=500, run_id="mymodel", callbacks=
 ## Freeze a checkpoint (snapshot) into a model in Python
 
 Use the provided utility script in this repository at [utils/tf_freezer.py](https://github.com/kecsap/tensorflow_cpp_packaging/blob/master/utils/tf_freezer.py):
-```
+```bash
 ./tf_freezer.py -c my_checkpoint -p final_model.pb -i Input/X -o Fc2/Sigmoid
 ```
 The above example assumes that you have three files related to a checkpoint inside the directory with my_checkpoint prefix (e.g. my_checkpoint.meta). The script will create a frozen protobuf model (final_model.pb). You must specify the input and output tensors with -i and -o. The default input tensor name is Input/X and the default output tensor name is FullyConnected/Sigmoid.
@@ -155,7 +155,7 @@ The above example assumes that you have three files related to a checkpoint insi
 
 Once you installed the Debian package of this project, CMake support is provided for Tensorflow inference in your C++ project.
 
-```
+```cmake
 # Find tensorflow-cpp
 FIND_PACKAGE(TensorFlowCpp REQUIRED PATHS /usr/lib/cmake/tensorflow-cpp)
 
@@ -173,7 +173,7 @@ TARGET_LINK_LIBRARIES(my_nice_app ${TENSORFLOWCPP_LIBRARIES})
 
 ## Load a checkpoint in C++
 
-```
+```c++
 #include <tensorflow/core/protobuf/meta_graph.pb.h>
 #include <tensorflow/core/public/session.h>
 
@@ -232,7 +232,7 @@ bool LoadGraph()
 ## Load a frozen model in C++
 
 Loading a frozen model is much more simple than loading a checkpoint:
-```
+```c++
 #include <tensorflow/core/protobuf/meta_graph.pb.h>
 #include <tensorflow/core/public/session.h>
 
@@ -271,7 +271,7 @@ bool LoadGraph()
 
 ## Inference in C++
 
-```
+```c++
 int Predict()
 {
   // The input tensor in this example is an image with resolution 160x96
@@ -318,7 +318,7 @@ int Predict()
 ## Load a frozen model in C
 
 Loading a frozen model is with the C API:
-```
+```c
 #include <tensorflow/c/c_api.h>
 
 TF_Status* Status = NULL;
@@ -362,7 +362,7 @@ bool LoadGraph()
 
 ## Inference in C
 
-```
+```c
 int Predict()
 {
   // Make prediction with C API
@@ -406,7 +406,7 @@ int Predict()
 
 Remember to release the allocated resources in the end:
 
-```
+```c
   TF_DeleteGraph(Graph);
   TF_DeleteSession(Session, Status);
   TF_DeleteSessionOptions(SessionOpts);
