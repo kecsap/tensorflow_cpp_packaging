@@ -38,6 +38,10 @@ export NCCL_INSTALL_PATH=/usr/
 # NOTE! This patch is not needed anymore for Tensorflow 1.12.0
 #git apply < $DIR/tf_nccl.patch || exit 1
 
+# Gcc 7.3 and up is broken for CUDA 10.1 now. Gcc 6 must be used for compilation via gcc/g++ system defaults
+#export CXX=g++-6
+#export CC=gcc-6
+
 # Modern CPU
 #export OPT_STR="--copt=-march=skylake"
 # AMD FX

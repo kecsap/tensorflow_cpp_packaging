@@ -12,7 +12,7 @@ index f6c928e2be..a6c7264b23 100644
 -  endif()
 +#  CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
 +#  if (COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
-+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=core2 -msse4.2")
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=sandybridge -mfma")
 +#  endif()
  endif()
  

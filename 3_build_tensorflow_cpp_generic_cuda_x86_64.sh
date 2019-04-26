@@ -12,7 +12,7 @@ rm -rf ${DIR}/packaging/libs/*
 
 # Clone tensorflow_cc
 cd ${DIR}
-git clone https://github.com/kecsap/tensorflow_cc/
+git clone https://github.com/FloopCZ/tensorflow_cc/
 
 # Clean up
 cd ${DIR}/tensorflow_cc/ || exit 1
@@ -20,8 +20,9 @@ git clean -fdx
 git reset --hard
 mkdir -p build && mkdir -p install && cd build || exit 1
 
+export GCC_HOST_COMPILER_PATH=/usr/bin/gcc
 export CC_OPT_FLAGS="-march=sandybridge -mfma"
-cmake -DTENSORFLOW_STATIC=OFF -DTENSORFLOW_SHARED=ON -DTENSORFLOW_TAG=56e4ea405d \
+cmake -DTENSORFLOW_STATIC=OFF -DTENSORFLOW_SHARED=ON -DTENSORFLOW_TAG=v1.13.1 \
       -DCMAKE_INSTALL_PREFIX=${DIR}/tensorflow_cc/install -B. -H../tensorflow_cc || exit 1
 make && make install || exit 1
 

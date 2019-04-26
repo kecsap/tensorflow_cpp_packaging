@@ -82,6 +82,15 @@ index 067c299a71..51338eb082 100644
    add_library(tf_protos_cc ${PROTO_GRPC_SRCS} ${PROTO_GRPC_HDRS} ${PROTO_SRCS} ${PROTO_HDRS})
  endif()
  
+@@ -272,7 +272,7 @@ if (NOT WIN32)
+   add_custom_command(OUTPUT __force_rebuild COMMAND ${CMAKE_COMMAND} -E echo)
+   add_custom_command(OUTPUT
+       ${VERSION_INFO_CC}
+-      COMMAND ${PYTHON_EXECUTABLE} ${tensorflow_source_dir}/tensorflow/tools/git/gen_git_source.py
++      COMMAND python2 ${tensorflow_source_dir}/tensorflow/tools/git/gen_git_source.py
+       ARGS --raw_generate ${VERSION_INFO_CC} --source_dir ${tensorflow_source_dir} --git_tag_override=${GIT_TAG_OVERRIDE}
+       DEPENDS __force_rebuild)
+ endif()
 diff --git a/tensorflow/contrib/cmake/tf_shared_lib.cmake b/tensorflow/contrib/cmake/tf_shared_lib.cmake
 index fdf522f1fd..1352033c2e 100644
 --- a/tensorflow/contrib/cmake/tf_shared_lib.cmake
@@ -92,22 +101,18 @@ index fdf522f1fd..1352033c2e 100644
  # TensorFlow runtime and the standard ops and kernels.
 -add_library(tensorflow SHARED
 +add_library(tensorflow STATIC
+     $<TARGET_OBJECTS:tf_c_eager>
+     $<TARGET_OBJECTS:tf_core_eager_runtime>
      $<TARGET_OBJECTS:tf_c>
-     $<TARGET_OBJECTS:tf_cc>
-     $<TARGET_OBJECTS:tf_cc_framework>
-@@ -108,9 +108,9 @@ install(TARGETS tensorflow EXPORT tensorflow_export
-         LIBRARY DESTINATION lib
-         ARCHIVE DESTINATION lib)
-         
--install(EXPORT tensorflow_export
--        FILE TensorflowConfig.cmake
--        DESTINATION lib/cmake)
-+#install(EXPORT tensorflow_export
-+#        FILE TensorflowConfig.cmake
-+#        DESTINATION lib/cmake)
+@@ -90,7 +90,7 @@ add_library(tensorflow SHARED
+ target_link_libraries(tensorflow PRIVATE
+     ${tf_core_gpu_kernels_lib}
+     ${tensorflow_EXTERNAL_LIBRARIES}
+-    tf_protos_cc
++    $<TARGET_FILE:tf_protos_cc>
+ )
  
- # install necessary headers
- # tensorflow headers
+ # There is a bug in GCC 5 resulting in undefined reference to a __cpu_model function when
 diff --git a/tensorflow/core/debug/debug_io_utils.cc b/tensorflow/core/debug/debug_io_utils.cc
 index 9e8002d490..01f45821dd 100644
 --- a/tensorflow/core/debug/debug_io_utils.cc
@@ -246,3 +251,234 @@ index c974a47051..a1132f6df3 100644
  #include "tensorflow/core/debug/debug_service.grpc.pb.h"
  
  namespace tensorflow {
+diff --git a/tensorflow/contrib/cmake/external/abseil_cpp.cmake b/tensorflow/contrib/cmake/external/abseil_cpp.cmake
+index 46a193971c..9afab30de0 100644
+--- a/tensorflow/contrib/cmake/external/abseil_cpp.cmake
++++ b/tensorflow/contrib/cmake/external/abseil_cpp.cmake
+@@ -39,8 +39,8 @@ else (systemlib_ABSEIL_CPP)
+   include (ExternalProject)
+ 
+   set(abseil_cpp_INCLUDE_DIR ${CMAKE_BINARY_DIR}/abseil_cpp/src/abseil_cpp)
+-  set(abseil_cpp_URL https://github.com/abseil/abseil-cpp/archive/e01d95528ea2137a4a27a88d1f57c6cb260aafed.tar.gz)
+-  set(abseil_cpp_HASH SHA256=84043ed402d2a2a6ba4cdddb7e85118b1158fd81fe4ac3a14adc343d054c1e2e)
++  set(abseil_cpp_URL https://github.com/abseil/abseil-cpp/archive/cd86d0d20ab167c33b23d3875db68d1d4bad3a3b.tar.gz)
++  #set(abseil_cpp_HASH SHA256=84043ed402d2a2a6ba4cdddb7e85118b1158fd81fe4ac3a14adc343d054c1e2e)
+   set(abseil_cpp_BUILD ${CMAKE_BINARY_DIR}/abseil_cpp/src/abseil_cpp-build)
+ 
+   if(WIN32)
+@@ -73,14 +73,23 @@ else (systemlib_ABSEIL_CPP)
+         ${abseil_cpp_BUILD}/absl/base/libabsl_throw_delegate.a
+         ${abseil_cpp_BUILD}/absl/numeric/libabsl_int128.a
+         ${abseil_cpp_BUILD}/absl/strings/libabsl_strings.a
+-        ${abseil_cpp_BUILD}/absl/strings/libstr_format_internal.a
++        ${abseil_cpp_BUILD}/absl/strings/libabsl_str_format_internal.a
++        ${abseil_cpp_BUILD}/absl/hash/libabsl_hash.a
++        ${abseil_cpp_BUILD}/absl/container/libabsl_hashtablez_sampler.a
++        ${abseil_cpp_BUILD}/absl/synchronization/libabsl_synchronization.a
++        ${abseil_cpp_BUILD}/absl/debugging/libabsl_stacktrace.a
++        ${abseil_cpp_BUILD}/absl/debugging/libabsl_symbolize.a
++        ${abseil_cpp_BUILD}/absl/debugging/libabsl_debugging_internal.a
++        ${abseil_cpp_BUILD}/absl/debugging/libabsl_demangle_internal.a
++        ${abseil_cpp_BUILD}/absl/time/libabsl_time.a
++        ${abseil_cpp_BUILD}/absl/time/libabsl_time_zone.a
++        ${abseil_cpp_BUILD}/absl/hash/libabsl_city.a
+         ${abseil_cpp_BUILD}/absl/types/libabsl_bad_optional_access.a)
+   endif()
+ 
+   ExternalProject_Add(abseil_cpp
+       PREFIX abseil_cpp
+       URL ${abseil_cpp_URL}
+-      URL_HASH ${abseil_cpp_HASH}
+       DOWNLOAD_DIR "${DOWNLOAD_LOCATION}"
+       BUILD_BYPRODUCTS ${abseil_cpp_STATIC_LIBRARIES}
+       INSTALL_COMMAND ""
+diff --git a/tensorflow/contrib/cmake/tf_tools.cmake b/tensorflow/contrib/cmake/tf_tools.cmake
+index 58c7df95c8..28443c9bf6 100644
+--- a/tensorflow/contrib/cmake/tf_tools.cmake
++++ b/tensorflow/contrib/cmake/tf_tools.cmake
+@@ -58,94 +58,94 @@ add_dependencies(tf_tools_transform_graph_lib tf_core_kernels)
+ add_dependencies(tf_tools_transform_graph_lib tf_core_lib)
+ add_dependencies(tf_tools_transform_graph_lib tf_core_ops)
+ 
+-set(transform_graph "transform_graph")
+-
+-add_executable(${transform_graph}
+-    "${tensorflow_source_dir}/tensorflow/tools/graph_transforms/transform_graph_main.cc"
+-    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
+-    $<TARGET_OBJECTS:tf_core_lib>
+-    $<TARGET_OBJECTS:tf_core_cpu>
+-    $<TARGET_OBJECTS:tf_core_framework>
+-    $<TARGET_OBJECTS:tf_core_ops>
+-    $<TARGET_OBJECTS:tf_core_direct_session>
+-    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
+-    $<TARGET_OBJECTS:tf_core_kernels>
+-    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<$<BOOL:${BOOL_WIN32}>:$<TARGET_OBJECTS:tf_core_kernels_cpu_only>>>
+-    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<TARGET_OBJECTS:tf_stream_executor>>
+-)
+-
+-target_link_libraries(${transform_graph} PUBLIC
+-  tf_protos_cc
+-  ${tf_core_gpu_kernels_lib}
+-  ${tensorflow_EXTERNAL_LIBRARIES}
+-)
+-
+-set(summarize_graph "summarize_graph")
+-
+-add_executable(${summarize_graph}
+-    "${tensorflow_source_dir}/tensorflow/tools/graph_transforms/summarize_graph_main.cc"
+-    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
+-    $<TARGET_OBJECTS:tf_core_lib>
+-    $<TARGET_OBJECTS:tf_core_cpu>
+-    $<TARGET_OBJECTS:tf_core_framework>
+-    $<TARGET_OBJECTS:tf_core_ops>
+-    $<TARGET_OBJECTS:tf_core_direct_session>
+-    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
+-    $<TARGET_OBJECTS:tf_core_kernels>
+-    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<$<BOOL:${BOOL_WIN32}>:$<TARGET_OBJECTS:tf_core_kernels_cpu_only>>>
+-    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<TARGET_OBJECTS:tf_stream_executor>>
+-)
+-
+-target_link_libraries(${summarize_graph} PUBLIC
+-  tf_protos_cc
+-  ${tf_core_gpu_kernels_lib}
+-  ${tensorflow_EXTERNAL_LIBRARIES}
+-)
+-
+-set(compare_graphs "compare_graphs")
+-
+-add_executable(${compare_graphs}
+-    "${tensorflow_source_dir}/tensorflow/tools/graph_transforms/compare_graphs.cc"
+-    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
+-    $<TARGET_OBJECTS:tf_core_lib>
+-    $<TARGET_OBJECTS:tf_core_cpu>
+-    $<TARGET_OBJECTS:tf_core_framework>
+-    $<TARGET_OBJECTS:tf_core_ops>
+-    $<TARGET_OBJECTS:tf_core_direct_session>
+-    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
+-    $<TARGET_OBJECTS:tf_core_kernels>
+-    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<$<BOOL:${BOOL_WIN32}>:$<TARGET_OBJECTS:tf_core_kernels_cpu_only>>>
+-    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<TARGET_OBJECTS:tf_stream_executor>>
+-)
+-
+-target_link_libraries(${compare_graphs} PUBLIC
+-  tf_protos_cc
+-  ${tf_core_gpu_kernels_lib}
+-  ${tensorflow_EXTERNAL_LIBRARIES}
+-)
+-
+-set(benchmark_model "benchmark_model")
+-
+-add_executable(${benchmark_model}
+-    "${tensorflow_source_dir}/tensorflow/tools/benchmark/benchmark_model.cc"
+-    "${tensorflow_source_dir}/tensorflow/tools/benchmark/benchmark_model_main.cc"
+-    $<TARGET_OBJECTS:tf_core_lib>
+-    $<TARGET_OBJECTS:tf_core_cpu>
+-    $<TARGET_OBJECTS:tf_core_framework>
+-    $<TARGET_OBJECTS:tf_core_ops>
+-    $<TARGET_OBJECTS:tf_core_direct_session>
+-    $<TARGET_OBJECTS:tf_core_kernels>
+-    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<$<BOOL:${BOOL_WIN32}>:$<TARGET_OBJECTS:tf_core_kernels_cpu_only>>>
+-    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<TARGET_OBJECTS:tf_stream_executor>>
+-)
+-
+-target_link_libraries(${benchmark_model} PUBLIC
+-  tf_protos_cc
+-  ${tf_core_gpu_kernels_lib}
+-  ${tensorflow_EXTERNAL_LIBRARIES}
+-)
+-
+-install(TARGETS ${transform_graph} ${summarize_graph} ${compare_graphs} ${benchmark_model}
+-        RUNTIME DESTINATION bin
+-        LIBRARY DESTINATION lib
+-        ARCHIVE DESTINATION lib)
++#set(transform_graph "transform_graph")
++
++#add_executable(${transform_graph}
++#    "${tensorflow_source_dir}/tensorflow/tools/graph_transforms/transform_graph_main.cc"
++#    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
++#    $<TARGET_OBJECTS:tf_core_lib>
++#    $<TARGET_OBJECTS:tf_core_cpu>
++#    $<TARGET_OBJECTS:tf_core_framework>
++#    $<TARGET_OBJECTS:tf_core_ops>
++#    $<TARGET_OBJECTS:tf_core_direct_session>
++#    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
++#    $<TARGET_OBJECTS:tf_core_kernels>
++#    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<$<BOOL:${BOOL_WIN32}>:$<TARGET_OBJECTS:tf_core_kernels_cpu_only>>>
++#    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<TARGET_OBJECTS:tf_stream_executor>>
++#)
++
++#target_link_libraries(${transform_graph} PUBLIC
++#  tf_protos_cc
++#  ${tf_core_gpu_kernels_lib}
++#  ${tensorflow_EXTERNAL_LIBRARIES}
++#)
++
++#set(summarize_graph "summarize_graph")
++
++#add_executable(${summarize_graph}
++#    "${tensorflow_source_dir}/tensorflow/tools/graph_transforms/summarize_graph_main.cc"
++#    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
++#    $<TARGET_OBJECTS:tf_core_lib>
++#    $<TARGET_OBJECTS:tf_core_cpu>
++#    $<TARGET_OBJECTS:tf_core_framework>
++#    $<TARGET_OBJECTS:tf_core_ops>
++#    $<TARGET_OBJECTS:tf_core_direct_session>
++#    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
++#    $<TARGET_OBJECTS:tf_core_kernels>
++#    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<$<BOOL:${BOOL_WIN32}>:$<TARGET_OBJECTS:tf_core_kernels_cpu_only>>>
++#    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<TARGET_OBJECTS:tf_stream_executor>>
++#)
++
++#target_link_libraries(${summarize_graph} PUBLIC
++#  tf_protos_cc
++#  ${tf_core_gpu_kernels_lib}
++#  ${tensorflow_EXTERNAL_LIBRARIES}
++#)
++
++#set(compare_graphs "compare_graphs")
++
++#add_executable(${compare_graphs}
++#    "${tensorflow_source_dir}/tensorflow/tools/graph_transforms/compare_graphs.cc"
++#    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
++#    $<TARGET_OBJECTS:tf_core_lib>
++#    $<TARGET_OBJECTS:tf_core_cpu>
++#    $<TARGET_OBJECTS:tf_core_framework>
++#    $<TARGET_OBJECTS:tf_core_ops>
++#    $<TARGET_OBJECTS:tf_core_direct_session>
++#    $<TARGET_OBJECTS:tf_tools_transform_graph_lib>
++#    $<TARGET_OBJECTS:tf_core_kernels>
++#    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<$<BOOL:${BOOL_WIN32}>:$<TARGET_OBJECTS:tf_core_kernels_cpu_only>>>
++#    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<TARGET_OBJECTS:tf_stream_executor>>
++#)
++
++#target_link_libraries(${compare_graphs} PUBLIC
++#  tf_protos_cc
++#  ${tf_core_gpu_kernels_lib}
++#  ${tensorflow_EXTERNAL_LIBRARIES}
++#)
++
++#set(benchmark_model "benchmark_model")
++
++#add_executable(${benchmark_model}
++#    "${tensorflow_source_dir}/tensorflow/tools/benchmark/benchmark_model.cc"
++#    "${tensorflow_source_dir}/tensorflow/tools/benchmark/benchmark_model_main.cc"
++#    $<TARGET_OBJECTS:tf_core_lib>
++#    $<TARGET_OBJECTS:tf_core_cpu>
++#    $<TARGET_OBJECTS:tf_core_framework>
++#    $<TARGET_OBJECTS:tf_core_ops>
++#    $<TARGET_OBJECTS:tf_core_direct_session>
++#    $<TARGET_OBJECTS:tf_core_kernels>
++#    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<$<BOOL:${BOOL_WIN32}>:$<TARGET_OBJECTS:tf_core_kernels_cpu_only>>>
++#    $<$<BOOL:${tensorflow_ENABLE_GPU}>:$<TARGET_OBJECTS:tf_stream_executor>>
++#)
++
++#target_link_libraries(${benchmark_model} PUBLIC
++#  tf_protos_cc
++#  ${tf_core_gpu_kernels_lib}
++#  ${tensorflow_EXTERNAL_LIBRARIES}
++#)
++
++#install(TARGETS ${transform_graph} ${summarize_graph} ${compare_graphs} ${benchmark_model}
++#        RUNTIME DESTINATION bin
++#        LIBRARY DESTINATION lib
++#        ARCHIVE DESTINATION lib)
