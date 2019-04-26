@@ -25,25 +25,28 @@ git reset --hard
 
 # Comment the following lines to disable python3
 export PYTHON_BIN_PATH=/usr/bin/python3
-pip3 install --user keras_applications
+#pip3 install --user keras_applications
 
 # Uncomment the following lines to enable CUDA support
 export TF_NEED_CUDA=True
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.0/extras/CUPTI/lib64
-export CUDA_TOOLKIT_PATH=/usr/local/cuda-10.0
-export TF_CUDA_VERSION=10.0
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.1/extras/CUPTI/lib64:/usr/lib/x86_64-linux-gnu
+export CUDA_TOOLKIT_PATH=/usr/local/cuda-10.1
+export TF_CUDA_VERSION=10.1
 export TF_CUDA_COMPUTE_CAPABILITIES=5.2,6.1,7.0
 export TF_NCCL_VERSION=2.3.7
 export NCCL_INSTALL_PATH=/usr/
 # NOTE! This patch is not needed anymore for Tensorflow 1.12.0
 #git apply < $DIR/tf_nccl.patch || exit 1
 
-export OPT_STR="--copt=-mavx --copt=-mfma"
+# Modern CPU
+#export OPT_STR="--copt=-march=skylake"
+# AMD FX
+export OPT_STR="--copt=-march=sandybridge --copt=-mfma"
 
 yes '' | ./configure || exit 1
 
 # Build a wheel package
-bazel build -c opt --copt=-mfpmath=both --copt=-march=core2 --copt=-msse4.2 $OPT_STR --copt=-O3 --verbose_failures -k //tensorflow/tools/pip_package:build_pip_package || exit 1
+bazel build -c opt --copt=-mfpmath=both  ${OPT_STR} --copt=-O3 --verbose_failures -k //tensorflow/tools/pip_package:build_pip_package || exit 1
 bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg || exit 1
 cp tensorflow/c/c_api.h $DIR/packaging/headers/tensorflow/c/
 cd /tmp/tensorflow_pkg/
