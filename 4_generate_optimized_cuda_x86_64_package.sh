@@ -8,7 +8,7 @@ if [ ! -d $DIR/packaging/headers ]; then
   exit 1
 fi
 if [ ! -d $DIR/packaging/libs ]; then
-  echo Get the Tensorflow C++ libraries with the 3_build_tensorflow_cpp_generic_cuda_x86_64.sh script
+  echo Get the Tensorflow C++ libraries with the 3_build_tensorflow_cpp_optimized_cuda_x86_64.sh script
   exit 1
 fi
 
@@ -26,11 +26,11 @@ DATE=20190225
 cd $DIR/packaging
 rm -rf debian/.debhelper debian/tensorflow-cpp-*
 rm -rf debian/debhelper-build-stamp debian/files
-cmake . -DGIT_TAG=${TAG} -DGIT_COMMIT=${COMMIT} -DGIT_DATE=${DATE} -DPKG_SUFFIX=generic-cuda -DCMAKE_INSTALL_PREFIX=/usr -DPKG_ARCH=amd64 -DRELEASE_MODE=OFF
+cmake . -DGIT_TAG=${TAG} -DGIT_COMMIT=${COMMIT} -DGIT_DATE=${DATE} -DPKG_SUFFIX=optimized-cuda -DCMAKE_INSTALL_PREFIX=/usr -DPKG_ARCH=amd64 -DRELEASE_MODE=OFF
 dpkg-buildpackage -rfakeroot -b -nc
 
 # Make a plain tar file
-tar -C ./debian/tensorflow-cpp-generic-cuda/ -cf ../tensorflow-cpp-generic-cuda_${TAG}~git${DATE}~${COMMIT}.tar usr/
-pxz -9 ../tensorflow-cpp-generic-cuda_${TAG}~git${DATE}~${COMMIT}.tar
+tar -C ./debian/tensorflow-cpp-optimized-cuda/ -cf ../tensorflow-cpp-optimized-cuda_${TAG}~git${DATE}~${COMMIT}.tar usr/
+pxz -9 ../tensorflow-cpp-optimized-cuda_${TAG}~git${DATE}~${COMMIT}.tar
 
-echo READY! Generic/CUDA x86_64 package is generated!
+echo READY! Optimized/CUDA x86_64 package is generated!

@@ -26,14 +26,16 @@ IF (NOT RELEASE_MODE)
 
   SET(TENSORFLOWCPP_VERSION ${GIT_TAG})
   SET(PKG_CONFLICTS "")
-  IF (${PKG_SUFFIX} STREQUAL "generic")
-    SET(PKG_CONFLICTS tensorflow-cpp-optimized,tensorflow-cpp-rpi,tensorflow-cpp-generic-cuda)
+  IF (${PKG_SUFFIX} STREQUAL "generic-cuda")
+    SET(PKG_CONFLICTS tensorflow-cpp-optimized-cuda,tensorflow-cpp-rpi,tensorflow-cpp-generic,tensorflow-cpp-optimized)
+  ELSEIF (${PKG_SUFFIX} STREQUAL "optimized-cuda")
+    SET(PKG_CONFLICTS tensorflow-cpp-generic-cuda,tensorflow-cpp-rpi,tensorflow-cpp-generic,tensorflow-cpp-optimized)
+  ELSEIF (${PKG_SUFFIX} STREQUAL "generic")
+    SET(PKG_CONFLICTS tensorflow-cpp-optimized,tensorflow-cpp-rpi,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda)
   ELSEIF (${PKG_SUFFIX} STREQUAL "optimized")
-    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-rpi,tensorflow-cpp-generic-cuda)
+    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-rpi,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda)
   ELSEIF (${PKG_SUFFIX} STREQUAL "rpi")
-    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-generic-cuda)
-  ELSE ()
-    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-rpi)
+    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda)
   ENDIF ()
 
   IF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized")
@@ -59,7 +61,7 @@ IF (NOT RELEASE_MODE)
       ${EXTRA_LIBS} -ldl -lpthread)
 
   # Override TENSORFLOWCPP_LIBS and TENSORFLOWCPP_STATIC_LIBS for CUDA version
-  IF (${PKG_SUFFIX} STREQUAL "generic-cuda")
+  IF (${PKG_SUFFIX} STREQUAL "generic-cuda" OR ${PKG_SUFFIX} STREQUAL "optimized-cuda")
     SET(TENSORFLOWCPP_LIBS -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp -L${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp
       -ltensorflow_cc -Wl,--no-as-needed ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libprotobuf.a -Wl,--as-needed)
     SET(TENSORFLOWCPP_STATIC_LIBS "")
@@ -81,7 +83,7 @@ ENDIF ()
 
 SET(INSTALL_LIBS libs/libabsl.a libs/libnsync-tf.a libs/libnsync-cpp-tf.a libs/libprotobuf-tf.so libs/libprotobuf-tf-static.a libs/libtensorflow-core.so libs/libtensorflow-core-static.a 
     ${EXTRA_INSTALL_LIBS})
-IF (${PKG_SUFFIX} STREQUAL "generic-cuda")
+IF (${PKG_SUFFIX} STREQUAL "generic-cuda" OR ${PKG_SUFFIX} STREQUAL "optimized-cuda")
   SET(INSTALL_LIBS libs/libprotobuf.a libs/libtensorflow_cc.so)
 ENDIF ()
 
