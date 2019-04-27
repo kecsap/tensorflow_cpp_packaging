@@ -21,7 +21,7 @@ git reset --hard
 mkdir -p build && mkdir -p install && cd build || exit 1
 
 export GCC_HOST_COMPILER_PATH=/usr/bin/gcc
-export CC_OPT_FLAGS="-march=skylake"
+export CC_OPT_FLAGS="-march=sandybridge -mfma"
 cmake -DTENSORFLOW_STATIC=OFF -DTENSORFLOW_SHARED=ON -DTENSORFLOW_TAG=v1.13.1 \
       -DCMAKE_INSTALL_PREFIX=${DIR}/tensorflow_cc/install -B. -H../tensorflow_cc || exit 1
 make && make install || exit 1
