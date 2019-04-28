@@ -33,7 +33,7 @@ sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-
 
 ### Dependencies for the latest CUDA packages
 
-You must install CUDA 10.1 from the official Nvidia repositories. Other configuration is not supported.
+You must install CUDA 10.1 from the official Nvidia repositories and Bazel 0.21.0 for Tensorflow. Other configurations are not supported.
 
 ### Dependencies for Raspberry Pi packages
 
