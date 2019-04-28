@@ -28,10 +28,8 @@ These results are generated with the same frozen graph (.pb file). The C/C++ inf
 
 - You must install some dependencies for **Ubuntu Bionic x86_64**:
 ```
-sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-dev libpng-dev libsqlite3-dev libsnappy-dev liblmdb-dev g++-6 gcc-6
+sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-dev libpng-dev libsqlite3-dev libsnappy-dev liblmdb-dev
 ```
-
-Current Protobuf in Tensorflow 1.13.1 does not compile with gcc 7.3+/8. We must install gcc 6 to build Tensorflow. Be sure that "gcc -v" and "g++ -v" shows a 6.x version: e.g. "gcc version 6.5.0 20181026 (Ubuntu 6.5.0-2ubuntu1~18.04)".
 
 ### Dependencies for the latest CUDA packages
 
@@ -52,8 +50,11 @@ Nothing.
 - Install Bazel: https://docs.bazel.build/versions/master/install-ubuntu.html
 - These build dependencies must be installed on **Ubuntu Bionic x86_64**:
 ```
-sudo apt-get install make g++ cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang pxz
+sudo apt-get install make g++-6 gcc-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang pxz
 ```
+
+Current Protobuf in Tensorflow 1.13.1 does not compile with gcc 7.3+/8. We must install gcc 6 to build Tensorflow. Be sure that "gcc -v" and "g++ -v" shows a 6.x version: e.g. "gcc version 6.5.0 20181026 (Ubuntu 6.5.0-2ubuntu1~18.04)" before building the packages. Using the packages does not require these specific gcc/g++ versions.
+
 - These build dependencies must be installed on **Raspberry Pi**:
 ```
 sudo apt-get install make g++-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot
