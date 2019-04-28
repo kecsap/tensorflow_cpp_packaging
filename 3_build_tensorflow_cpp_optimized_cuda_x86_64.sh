@@ -18,6 +18,7 @@ git clone https://github.com/FloopCZ/tensorflow_cc/
 cd ${DIR}/tensorflow_cc/ || exit 1
 git clean -fdx
 git reset --hard
+git co 419eb9d9d34575b05e80e0e81aa67f5fa75a4fc7
 mkdir -p build && mkdir -p install && cd build || exit 1
 
 export GCC_HOST_COMPILER_PATH=/usr/bin/gcc
