@@ -1,17 +1,18 @@
 # Tensorflow C/C++ inference with Debian packages on Ubuntu x86_64 and Raspberry Pi
 
 - The generic and optimized x86_64 builds are based on the "TensorFlow CMake" component in tensorflow/contrib/cmake directory.
-- The optimized/CUDA x86_64 build is based on [tensorflow_cc project](https://github.com/FloopCZ/tensorflow_cc), thanks to FloopCZ.
+- The CUDA x86_64 build is based on [tensorflow_cc project](https://github.com/FloopCZ/tensorflow_cc), thanks to FloopCZ.
 - The Raspberry Pi build is based on the "TensorFlow Makefile" component in tensorflow/contrib/makefile directory.
 - Two targets were tested: Ubuntu Bionic (x86_64) and Raspberry Pi Ubuntu MATE Xenial (armhf).
-- Generic, optimized and Raspberry Pi packages contain both static and shared Tensorflow libraries. The choice is on your side. However, the optimized/CUDA build only ships shared libraries.
-- CPU can be used for inference, GPU support is only in the optimized/CUDA packages.
+- Generic, optimized and Raspberry Pi packages contain both static and shared Tensorflow libraries. The choice is on your side. However, the CUDA builds only ship shared libraries.
+- CPU can be used for inference, GPU support is only in the CUDA packages.
 - Debian packages are generated from the built binary files for distribution.
 - The build contains e.g. the C/C++ API to load model "snapshots" or frozen models. Other parts of the C++ API is included, but they are untested.
+- CUDA support with Tensorflow 1.13.1 requires to all GPU memory available for inference by default otherwise it drops error message. To allow_growth option must be set to allow multiple processes doing inference on the same GPU. See in the example codes below.
 
 ## Status
 
-I trained a simple CNN model with TFLearn for a 2-label classification and the inference works on Ubuntu and Raspberry Pi, however, there are differences in the accuracies:
+I trained a simple CNN model with TFLearn (and Tensorflow 1.10) for a 2-label classification and the inference works on Ubuntu and Raspberry Pi, however, there are differences in the accuracies:
 
 | Platform         | Class 1 | Class 2 |
 |------------------|:-------:|:-------:|
@@ -30,9 +31,9 @@ These results are generated with the same frozen graph (.pb file). The C/C++ inf
 sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-dev libpng-dev libsqlite3-dev libsnappy-dev liblmdb-dev
 ```
 
-### Dependencies for optimized/CUDA packages
+### Dependencies for the latest CUDA packages
 
-You must install CUDA 10 from the official Nvidia repositories. Other configuration is not supported.
+You must install CUDA 10.1 from the official Nvidia repositories. Other configuration is not supported.
 
 ### Dependencies for Raspberry Pi packages
 
@@ -81,15 +82,20 @@ Latest master:
 ```
 - Compile the Tensorflow C++ libraries for the desired platform:
 
-Generic build for Ubuntu x86_64, optimized only for SSE 4.2 (post Core 2 Duo processors):
+Generic build for Ubuntu x86_64, optimized for minimum Haswell of Intel and Piledriver of AMD (AVX, FMA instructions):
 ```
 ./3_build_tensorflow_cpp_generic_x86_64.sh
 ```
-Optimized build for Ubuntu x86_64, optimized only for SSE/AVX1/FMA. AVX2 optimization was left out on purpose for compatibility with the older AMD FX processors:
+Optimized build for Ubuntu x86_64, optimized for minimum Skylake of Intel and Excavator of AMD (AVX, AVX2, FMA instructions):
 ```
 ./3_build_tensorflow_cpp_optimized_x86_64.sh
 ```
-Optimized/CUDA build for Ubuntu x86_64, optimized for SSE/AVX1/FMA. The optimized build had to be compiled first to get all C++ headers correctly:
+Generic/CUDA build for Ubuntu x86_64, optimized for minimum Haswell of Intel and Piledriver of AMD (AVX, FMA instructions). The generic build had to be compiled first to get all C++ headers correctly:
+```
+./3_build_tensorflow_cpp_generic_x86_64.sh
+./3_build_tensorflow_cpp_generic_cuda_x86_64.sh
+```
+Optimized/CUDA build for Ubuntu x86_64, optimized for minimum Skylake of Intel and Excavator of AMD (AVX, AVX2, FMA instructions). The optimized build had to be compiled first to get all C++ headers correctly:
 ```
 ./3_build_tensorflow_cpp_optimized_x86_64.sh
 ./3_build_tensorflow_cpp_optimized_cuda_x86_64.sh
@@ -107,6 +113,10 @@ Generic build for Ubuntu x86_64:
 Optimized build for Ubuntu x86_64:
 ```
 ./4_generate_optimized_x86_64_package.sh
+```
+Generic/CUDA build for Ubuntu x86_64:
+```
+./4_generate_generic_cuda_x86_64_package.sh
 ```
 Optimized/CUDA build for Ubuntu x86_64:
 ```
@@ -184,8 +194,15 @@ bool LoadGraph()
 {
   const std::string PathToGraph = "my_checkpoint.meta";
   const std::string CheckpointPrefix = "my_checkpoint";
-
-  Session = tensorflow::NewSession(tensorflow::SessionOptions());
+  // Ignore info logs
+  char EnvStr[] = "TF_CPP_MIN_LOG_LEVEL=1";
+  
+  putenv(EnvStr);
+  // Dynamic GPU memory allocation
+  tensorflow::SessionOptions SessionOptions;
+  
+  SessionOptions.config.mutable_gpu_options()->set_allow_growth(true);
+  Session = tensorflow::NewSession(SessionOptions);
   if (Session == nullptr)
   {
     printf("Could not create Tensorflow session.\n");
