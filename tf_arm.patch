@@ -51,3 +51,56 @@ index 19ccb6e71d..f6a211a81b 100644
    status->status = tensorflow::errors::Unimplemented(
        "Loading a SavedModel is not supported in Android. File a bug at "
        "https://github.com/tensorflow/tensorflow/issues if this feature is "
+@@ -2819,14 +2819,14 @@ TF_Buffer* TF_GetRegisteredKernelsForOp(const char* name, TF_Status* status) {
+ 
+ // TF_Server functions ----------------------------------------------
+ 
+-#ifndef __ANDROID__
++#if !defined(__ANDROID__) && !defined(IS_SLIM_BUILD)
+ TF_Server::TF_Server(std::unique_ptr<tensorflow::ServerInterface> server)
+     : target(server->target()), server(std::move(server)) {}
+ #endif  // __ANDROID__
+ 
+ TF_Server* TF_NewServer(const void* proto, size_t proto_len,
+                         TF_Status* status) {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(IS_SLIM_BUILD)
+   status->status = tensorflow::errors::Unimplemented(
+       "Server functionality is not supported in Android");
+   return nullptr;
+@@ -2847,7 +2847,7 @@ TF_Server* TF_NewServer(const void* proto, size_t proto_len,
+ }
+ 
+ void TF_ServerStart(TF_Server* server, TF_Status* status) {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(IS_SLIM_BUILD)
+   status->status = tensorflow::errors::Unimplemented(
+       "Server functionality is not supported in Android");
+ #else
+@@ -2856,7 +2856,7 @@ void TF_ServerStart(TF_Server* server, TF_Status* status) {
+ }
+ 
+ void TF_ServerStop(TF_Server* server, TF_Status* status) {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(IS_SLIM_BUILD)
+   status->status = tensorflow::errors::Unimplemented(
+       "Server functionality is not supported in Android");
+ #else
+@@ -2865,7 +2865,7 @@ void TF_ServerStop(TF_Server* server, TF_Status* status) {
+ }
+ 
+ void TF_ServerJoin(TF_Server* server, TF_Status* status) {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(IS_SLIM_BUILD)
+   status->status = tensorflow::errors::Unimplemented(
+       "Server functionality is not supported in Android");
+ #else
+@@ -2874,7 +2874,7 @@ void TF_ServerJoin(TF_Server* server, TF_Status* status) {
+ }
+ 
+ const char* TF_ServerTarget(TF_Server* server) {
+-#ifdef __ANDROID__
++#if defined(__ANDROID__) || defined(IS_SLIM_BUILD)
+   return nullptr;
+ #else
+   return server->target.c_str();
