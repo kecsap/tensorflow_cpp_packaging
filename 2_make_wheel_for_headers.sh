@@ -27,23 +27,26 @@ git reset --hard
 export PYTHON_BIN_PATH=/usr/bin/python3
 #pip3 install --user keras_applications
 
-# Uncomment the following lines to enable CUDA support
-export TF_NEED_CUDA=True
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.1/extras/CUPTI/lib64:/usr/lib/x86_64-linux-gnu
-export CUDA_TOOLKIT_PATH=/usr/local/cuda-10.1
-export TF_CUDA_VERSION=10.1
-export TF_CUDA_COMPUTE_CAPABILITIES=6.1,7.5
-export TF_NCCL_VERSION=2.4.2
-export NCCL_INSTALL_PATH=/usr/
+if [[ -z "${NO_TF_PACKAGING_CUDA}" ]]; then
+  export TF_NEED_CUDA=True
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-10.1/extras/CUPTI/lib64:/usr/lib/x86_64-linux-gnu
+  export CUDA_TOOLKIT_PATH=/usr/local/cuda-10.1
+  export TF_CUDA_VERSION=10.1
+  export TF_CUDA_COMPUTE_CAPABILITIES=6.1,7.5
+  export TF_NCCL_VERSION=2.4.2
+  export NCCL_INSTALL_PATH=/usr/
+fi
 
 # Gcc 7.3 and up is broken for CUDA 10.1 now. Gcc 6 must be used for compilation via gcc/g++ system defaults
 #export CXX=g++-6
 #export CC=gcc-6
 
-# Modern CPU
-#export OPT_STR="--copt=-march=skylake"
 # AMD FX
 export OPT_STR="--copt=-march=sandybridge --copt=-mfma"
+# Modern CPU
+if [[ -z "${TF_PACKAGING_LEGACY_CPU}" ]]; then
+  export OPT_STR="--copt=-march=skylake"
+fi
 
 yes '' | ./configure || exit 1
 

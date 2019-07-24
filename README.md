@@ -79,7 +79,7 @@ Latest master:
 ```
 ./1_clone_tensorflow.sh v1.6.0
 ```
-- Make the python package to extract include files for C++:
+- Make the python package to extract include files for C++. Define NO_TF_PACKAGING_CUDA environmental variable to disable CUDA support or use TF_PACKAGING_LEGACY_CPU for older CPUs (AMD FX):
 ```
 ./2_make_wheel_for_headers.sh
 ```
