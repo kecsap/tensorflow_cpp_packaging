@@ -35,11 +35,16 @@ if [[ -z "${NO_TF_PACKAGING_CUDA}" ]]; then
   export TF_CUDA_COMPUTE_CAPABILITIES=6.1,7.5
   export TF_NCCL_VERSION=2.4.2
   export NCCL_INSTALL_PATH=/usr/
+elfi
+  export TF_NEED_CUDA=False
+  export TF_CUDA_VERSION=10.1
+  export TF_CUDA_COMPUTE_CAPABILITIES=6.1,7.5
+  export TF_NCCL_VERSION=2.4.2
 fi
 
 # Gcc 7.3 and up is broken for CUDA 10.1 now. Gcc 6 must be used for compilation via gcc/g++ system defaults
-#export CXX=g++-6
-#export CC=gcc-6
+export CXX=g++-6
+export CC=gcc-6
 
 # AMD FX
 export OPT_STR="--copt=-march=sandybridge --copt=-mfma"
