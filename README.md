@@ -28,7 +28,7 @@ These results are generated with the same frozen graph (.pb file). The C/C++ inf
 
 - You must install some dependencies for **Ubuntu Bionic x86_64**:
 ```
-sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-dev libpng-dev libsqlite3-dev libsnappy-dev liblmdb-dev
+sudo apt-get install libdouble-conversion-dev libfarmhash-dev libre2-dev libgif-dev libpng-dev libsqlite3-dev libsnappy-dev liblmdb-dev libicu-dev
 ```
 
 ### Dependencies for the latest CUDA packages
