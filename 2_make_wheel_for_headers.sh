@@ -35,7 +35,7 @@ if [[ -z "${NO_TF_PACKAGING_CUDA}" ]]; then
   export TF_CUDA_COMPUTE_CAPABILITIES=6.1,7.5
   export TF_NCCL_VERSION=2.4.2
   export NCCL_INSTALL_PATH=/usr/
-elfi
+else
   export TF_NEED_CUDA=False
   export TF_CUDA_VERSION=10.1
   export TF_CUDA_COMPUTE_CAPABILITIES=6.1,7.5

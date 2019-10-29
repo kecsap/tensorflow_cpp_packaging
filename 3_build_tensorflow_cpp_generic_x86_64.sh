@@ -36,7 +36,7 @@ cd tensorflow/contrib/cmake
 cmake . -Dtensorflow_ENABLE_GRPC_SUPPORT=OFF -Dtensorflow_ENABLE_SSL_SUPPORT=OFF -Dtensorflow_BUILD_PYTHON_BINDINGS=OFF -Dsystemlib_ABSEIL_CPP=OFF \
         -Dtensorflow_ENABLE_POSITION_INDEPENDENT_CODE=ON -Dtensorflow_BUILD_SHARED_LIB=ON -Dtensorflow_BUILD_CC_EXAMPLE=OFF -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=${DIR}/tensorflow/install || exit 1
-make -j8 abseil_cpp || exit 1
+make -j8 abseil_cpp_build || exit 1
 make -j8 tf_core_ops || exit 1
 make -j8 tensorflow install || exit 1
 
