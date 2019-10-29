@@ -31,11 +31,11 @@ DATE=$(git log -1 --date=short --pretty=format:%cd | tr -d '-')
 cd $DIR/packaging
 rm -rf debian/.debhelper debian/tensorflow-cpp-*
 rm -rf debian/debhelper-build-stamp debian/files
-cmake . -DGIT_TAG=${TAG} -DGIT_COMMIT=${COMMIT} -DGIT_DATE=${DATE} -DPKG_SUFFIX=optimized -DCMAKE_INSTALL_PREFIX=/usr -DPKG_ARCH=amd64 -DRELEASE_MODE=OFF
+cmake . -DGIT_TAG=${TAG} -DGIT_COMMIT=${COMMIT} -DGIT_DATE=${DATE} -DPKG_SUFFIX=legacy -DCMAKE_INSTALL_PREFIX=/usr -DPKG_ARCH=amd64 -DRELEASE_MODE=OFF
 dpkg-buildpackage -rfakeroot -b -nc
 
 # Make a plain tar file
-tar -C ./debian/tensorflow-cpp-optimized/ -cf ../tensorflow-cpp-optimized_${TAG}~git${DATE}~${COMMIT}.tar usr/
-pxz -9 ../tensorflow-cpp-optimized_${TAG}~git${DATE}~${COMMIT}.tar
+tar -C ./debian/tensorflow-cpp-legacy/ -cf ../tensorflow-cpp-legacy_${TAG}~git${DATE}~${COMMIT}.tar usr/
+pxz -9 ../tensorflow-cpp-legacy_${TAG}~git${DATE}~${COMMIT}.tar
 
-echo READY! Optimized x86_64 package is generated!
+echo READY! Generic x86_64 package is generated!

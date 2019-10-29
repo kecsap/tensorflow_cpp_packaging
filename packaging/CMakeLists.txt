@@ -27,21 +27,23 @@ IF (NOT RELEASE_MODE)
   SET(TENSORFLOWCPP_VERSION ${GIT_TAG})
   SET(PKG_CONFLICTS "")
   IF (${PKG_SUFFIX} STREQUAL "generic-cuda")
-    SET(PKG_CONFLICTS tensorflow-cpp-optimized-cuda,tensorflow-cpp-rpi,tensorflow-cpp-generic,tensorflow-cpp-optimized)
+    SET(PKG_CONFLICTS tensorflow-cpp-optimized-cuda,tensorflow-cpp-rpi,tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-legacy)
   ELSEIF (${PKG_SUFFIX} STREQUAL "optimized-cuda")
-    SET(PKG_CONFLICTS tensorflow-cpp-generic-cuda,tensorflow-cpp-rpi,tensorflow-cpp-generic,tensorflow-cpp-optimized)
+    SET(PKG_CONFLICTS tensorflow-cpp-generic-cuda,tensorflow-cpp-rpi,tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-legacy)
   ELSEIF (${PKG_SUFFIX} STREQUAL "generic")
-    SET(PKG_CONFLICTS tensorflow-cpp-optimized,tensorflow-cpp-rpi,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda)
+    SET(PKG_CONFLICTS tensorflow-cpp-optimized,tensorflow-cpp-rpi,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda,tensorflow-cpp-legacy)
   ELSEIF (${PKG_SUFFIX} STREQUAL "optimized")
-    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-rpi,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda)
+    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-rpi,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda,tensorflow-cpp-legacy)
   ELSEIF (${PKG_SUFFIX} STREQUAL "rpi")
-    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda)
+    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda,tensorflow-cpp-legacy)
+  ELSEIF (${PKG_SUFFIX} STREQUAL "legacy")
+    SET(PKG_CONFLICTS tensorflow-cpp-generic,tensorflow-cpp-optimized,tensorflow-cpp-generic-cuda,tensorflow-cpp-optimized-cuda,tensorflow-cpp-rpi)
   ENDIF ()
 
-  IF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized")
-    SET(EXTRA_LIBS "-ltf_protos_cc -fopenmp -lpng16 -lsqlite3 -lsnappy -lgif -ldouble-conversion -llmdb -lre2 -ljpeg -lz -lfarmhash -licuuc")
+  IF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized" OR ${PKG_SUFFIX} STREQUAL "legacy")
+    SET(EXTRA_LIBS "-ltf_protos_cc -fopenmp -lpng16 -lsqlite3 -lsnappy -lgif -ldouble-conversion -llmdb -lre2 -ljpeg -lz -lfarmhash -licuuc -ljsoncpp")
     SET(EXTRA_STATIC_LIBS "")
-    SET(EXTRA_DEPS ", libdouble-conversion-dev, libfarmhash-dev, libre2-dev, libgif-dev, libpng-dev, libsqlite3-dev, libsnappy-dev, liblmdb-dev, libjpeg-dev, libicu-dev")
+    SET(EXTRA_DEPS ", libdouble-conversion-dev, libfarmhash-dev, libre2-dev, libgif-dev, libpng-dev, libsqlite3-dev, libsnappy-dev, liblmdb-dev, libjpeg-dev, libicu-dev, libjsoncpp-dev")
   ELSE ()
     SET(EXTRA_LIBS "")
     SET(EXTRA_STATIC_LIBS "${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtf_protos_cc-static.a")
@@ -60,11 +62,12 @@ IF (NOT RELEASE_MODE)
   ENDIF ()
 
   SET(TENSORFLOWCPP_LIBS -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp -L${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp
-      -ltensorflow-core -Wl,--no-as-needed -lprotobuf-tf ${ABSL_LIBRARY}
+      -ltensorflow-core -Wl,--no-as-needed -lprotobuf-tf ${ABSL_LIBRARY} ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtf_core_profiler.a
       ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libnsync-tf.a ${NSYNC_CPP_LIBRARY}
       ${EXTRA_LIBS} -Wl,--as-needed -ldl -lpthread)
   SET(TENSORFLOWCPP_STATIC_LIBS -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp -L${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp
       -Wl,--whole-archive ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtensorflow-core-static.a ${EXTRA_STATIC_LIBS}
+      ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtf_core_profiler.a
       ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libprotobuf-tf-static.a -Wl,--no-whole-archive -Wl,--allow-multiple-definition
       ${ABSL_LIBRARY}
       ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libnsync-tf.a ${NSYNC_CPP_LIBRARY}
@@ -86,8 +89,8 @@ ENDIF ()
 
 IF (${PKG_SUFFIX} STREQUAL "rpi")
   SET(EXTRA_INSTALL_LIBS "")
-ELSEIF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized")
-  SET(EXTRA_INSTALL_LIBS libs/libnsync-cpp-tf.a libs/libtf_protos_cc.so libs/libtf_protos_cc-static.a libs/libabsl.a)
+ELSEIF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized" OR ${PKG_SUFFIX} STREQUAL "legacy")
+  SET(EXTRA_INSTALL_LIBS libs/libnsync-cpp-tf.a libs/libtf_protos_cc.so libs/libtf_protos_cc-static.a libs/libabsl.a libs/libtf_core_profiler.a)
 ELSE ()
   SET(EXTRA_INSTALL_LIBS libs/libnsync-cpp-tf.a libs/libabsl.a)
 ENDIF ()

@@ -25,7 +25,8 @@ git reset --hard
 
 # Comment the following lines to disable python3
 export PYTHON_BIN_PATH=/usr/bin/python3
-#pip3 install --user keras_applications
+pip3 install -U --user keras_applications==1.0.6 --no-deps
+pip3 install -U --user keras_preprocessing==1.0.5 --no-deps
 
 if [[ -z "${NO_TF_PACKAGING_CUDA}" ]]; then
   export TF_NEED_CUDA=True
@@ -33,13 +34,13 @@ if [[ -z "${NO_TF_PACKAGING_CUDA}" ]]; then
   export CUDA_TOOLKIT_PATH=/usr/local/cuda-10.1
   export TF_CUDA_VERSION=10.1
   export TF_CUDA_COMPUTE_CAPABILITIES=6.1,7.5
-  export TF_NCCL_VERSION=2.4.2
+  export TF_NCCL_VERSION=2.4.8
   export NCCL_INSTALL_PATH=/usr/
 else
   export TF_NEED_CUDA=False
   export TF_CUDA_VERSION=10.1
   export TF_CUDA_COMPUTE_CAPABILITIES=6.1,7.5
-  export TF_NCCL_VERSION=2.4.2
+  export TF_NCCL_VERSION=2.4.8
 fi
 
 # Gcc 7.3 and up is broken for CUDA 10.1 now. Gcc 6 must be used for compilation via gcc/g++ system defaults
@@ -59,6 +60,7 @@ yes '' | ./configure || exit 1
 bazel build -c opt --copt=-mfpmath=both  ${OPT_STR} --copt=-O3 --verbose_failures -k //tensorflow/tools/pip_package:build_pip_package || exit 1
 bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg || exit 1
 cp tensorflow/c/c_api.h $DIR/packaging/headers/tensorflow/c/
+cp tensorflow/c/tf_attrtype.h $DIR/packaging/headers/tensorflow/c/
 cd /tmp/tensorflow_pkg/
 unzip *.whl
 cd tensorflow-*.data

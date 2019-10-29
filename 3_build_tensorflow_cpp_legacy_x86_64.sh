@@ -25,9 +25,9 @@ if [ $? != 0 ]; then
   echo -e "FATAL: tf_base.patch FAILED!"
   exit 1
 fi
-patch -p1 < $DIR/tf_generic_x86_64.patch
+patch -p1 < $DIR/tf_legacy_x86_64.patch
 if [ $? != 0 ]; then
-  echo -e "FATAL: tf_generic_x86_64.patch FAILED!"
+  echo -e "FATAL: tf_legacy_x86_64.patch FAILED!"
   exit 1
 fi
 

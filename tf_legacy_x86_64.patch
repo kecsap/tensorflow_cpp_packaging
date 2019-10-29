@@ -1,0 +1,19 @@
+diff --git a/tensorflow/contrib/cmake/CMakeLists.txt b/tensorflow/contrib/cmake/CMakeLists.txt
+index f6c928e2be..a6c7264b23 100644
+--- a/tensorflow/contrib/cmake/CMakeLists.txt
++++ b/tensorflow/contrib/cmake/CMakeLists.txt
+@@ -190,10 +190,10 @@ endif()
+ 
+ if (tensorflow_OPTIMIZE_FOR_NATIVE_ARCH)
+   include(CheckCXXCompilerFlag)
+-  CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+-  if (COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
+-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native")
+-  endif()
++#  CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
++#  if (COMPILER_OPT_ARCH_NATIVE_SUPPORTED)
++    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=ivybridge")
++#  endif()
+ endif()
+ 
+ include(CheckCXXCompilerFlag)

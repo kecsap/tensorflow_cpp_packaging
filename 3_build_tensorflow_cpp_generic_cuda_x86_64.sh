@@ -18,13 +18,16 @@ git clone https://github.com/FloopCZ/tensorflow_cc/
 cd ${DIR}/tensorflow_cc/ || exit 1
 git clean -fdx
 git reset --hard
-git co 419eb9d9d34575b05e80e0e81aa67f5fa75a4fc7
+git co 11c2f365094e654997dce2013d6bf9cc815cc9fc
 mkdir -p build && mkdir -p install && cd build || exit 1
 
-export GCC_HOST_COMPILER_PATH=/usr/bin/gcc
+export CXX=g++-6
+export CC=gcc-6
+export GCC_HOST_COMPILER_PATH=/usr/bin/gcc-6
 export CC_OPT_FLAGS="-march=sandybridge -mfma"
 export TF_CUDA_COMPUTE_CAPABILITIES=6.1,7.5
-cmake -DTENSORFLOW_STATIC=OFF -DTENSORFLOW_SHARED=ON -DTENSORFLOW_TAG=v1.13.1 \
+export TF_NCCL_VERSION=2.4.8
+cmake -DTENSORFLOW_STATIC=OFF -DTENSORFLOW_SHARED=ON -DTENSORFLOW_TAG=v1.14.0 \
       -DCMAKE_INSTALL_PREFIX=${DIR}/tensorflow_cc/install -B. -H../tensorflow_cc || exit 1
 make && make install || exit 1
 
