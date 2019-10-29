@@ -50,7 +50,7 @@ Nothing.
 - Install Bazel: https://docs.bazel.build/versions/master/install-ubuntu.html
 - These build dependencies must be installed on **Ubuntu Bionic x86_64**:
 ```
-sudo apt-get install make g++-6 gcc-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang pxz libicu-dev python
+sudo apt-get install make g++-6 gcc-6 cmake git dpkg-dev debhelper quilt python3 autogen autoconf libtool fakeroot golang pxz libicu-dev python python-future
 ```
 
 Current Protobuf in Tensorflow 1.13.1 does not compile with gcc 7.3+/8. We must install gcc 6 to build Tensorflow. Be sure that "gcc -v" and "g++ -v" shows a 6.x version: e.g. "gcc version 6.5.0 20181026 (Ubuntu 6.5.0-2ubuntu1~18.04)" before building the packages. Using the packages does not require these specific gcc/g++ versions.
