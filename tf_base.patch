@@ -2,20 +2,22 @@ diff --git a/tensorflow/c/eager/c_api.cc b/tensorflow/c/eager/c_api.cc
 index dfb1c9a376..248ed67450 100644
 --- a/tensorflow/c/eager/c_api.cc
 +++ b/tensorflow/c/eager/c_api.cc
-@@ -36,9 +36,9 @@ limitations under the License.
- #include "tensorflow/core/common_runtime/eager/execute.h"
- #include "tensorflow/core/common_runtime/function.h"
+@@ -47,10 +47,10 @@ limitations under the License.
  #include "tensorflow/core/common_runtime/rendezvous_mgr.h"
+ #if !defined(IS_MOBILE_PLATFORM)
+ #include "tensorflow/core/distributed_runtime/remote_device.h"
 -#include "tensorflow/core/distributed_runtime/rpc/eager/grpc_eager_client.h"
 -#include "tensorflow/core/distributed_runtime/rpc/grpc_channel.h"
 -#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
+-#include "tensorflow/core/distributed_runtime/rpc/rpc_rendezvous_mgr.h"
 +//#include "tensorflow/core/distributed_runtime/rpc/eager/grpc_eager_client.h"
 +//#include "tensorflow/core/distributed_runtime/rpc/grpc_channel.h"
 +//#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
++//#include "tensorflow/core/distributed_runtime/rpc/rpc_rendezvous_mgr.h"
  #include "tensorflow/core/distributed_runtime/server_lib.h"
  #include "tensorflow/core/distributed_runtime/worker_env.h"
- #include "tensorflow/core/framework/node_def_util.h"
-@@ -167,6 +167,7 @@ tensorflow::Status UpdateTFE_ContextWithServerDef(
+ #endif  // !IS_MOBILE_PLATFORM
+@@ -195,6 +195,7 @@ tensorflow::Status UpdateTFE_ContextWithServerDef(
      }                                                   \
    } while (0);
  
@@ -23,33 +25,16 @@ index dfb1c9a376..248ed67450 100644
    string worker_name =
        tensorflow::strings::StrCat("/job:", server_def.job_name(),
                                    "/replica:0/task:", server_def.task_index());
-@@ -229,6 +230,7 @@ tensorflow::Status UpdateTFE_ContextWithServerDef(
-                                 std::move(remote_device_mgr), remote_contexts,
-                                 r, device_mgr, keep_alive_secs);
- 
+@@ -276,6 +277,8 @@ tensorflow::Status UpdateTFE_ContextWithServerDef(
+       std::move(remote_eager_workers), std::move(remote_device_mgr),
+       remote_contexts, r, device_mgr, keep_alive_secs,
+       worker_session->cluster_flr.get());
 +#endif
-   return tensorflow::Status::OK();
++  return tensorflow::Status::OK();
  #undef LOG_AND_RETURN_IF_ERROR
  }
-diff --git a/tensorflow/c/eager/c_api_internal.h b/tensorflow/c/eager/c_api_internal.h
-index a5c0681e2e..40e26885ba 100644
---- a/tensorflow/c/eager/c_api_internal.h
-+++ b/tensorflow/c/eager/c_api_internal.h
-@@ -39,10 +39,10 @@ limitations under the License.
- #include "tensorflow/core/common_runtime/rendezvous_mgr.h"
- #include "tensorflow/core/distributed_runtime/eager/eager_client.h"
- #include "tensorflow/core/distributed_runtime/remote_device.h"
--#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
--#include "tensorflow/core/distributed_runtime/rpc/grpc_worker_cache.h"
--#include "tensorflow/core/distributed_runtime/rpc/grpc_worker_service.h"
--#include "tensorflow/core/distributed_runtime/rpc/rpc_rendezvous_mgr.h"
-+//#include "tensorflow/core/distributed_runtime/rpc/grpc_server_lib.h"
-+//#include "tensorflow/core/distributed_runtime/rpc/grpc_worker_cache.h"
-+//#include "tensorflow/core/distributed_runtime/rpc/grpc_worker_service.h"
-+//#include "tensorflow/core/distributed_runtime/rpc/rpc_rendezvous_mgr.h"
- #include "tensorflow/core/distributed_runtime/server_lib.h"
- #include "tensorflow/core/distributed_runtime/worker_env.h"
- #include "tensorflow/core/framework/rendezvous.h"
+ #endif  // !IS_MOBILE_PLATFORM
+
 diff --git a/tensorflow/contrib/cmake/tf_core_framework.cmake b/tensorflow/contrib/cmake/tf_core_framework.cmake
 index 067c299a71..51338eb082 100644
 --- a/tensorflow/contrib/cmake/tf_core_framework.cmake
@@ -242,56 +227,16 @@ diff --git a/tensorflow/core/debug/debug_io_utils.h b/tensorflow/core/debug/debu
 index c974a47051..a1132f6df3 100644
 --- a/tensorflow/core/debug/debug_io_utils.h
 +++ b/tensorflow/core/debug/debug_io_utils.h
-@@ -223,7 +223,7 @@ struct hash<::tensorflow::DebugNodeKey> {
+@@ -252,7 +252,7 @@ struct hash<::tensorflow::DebugNodeKey> {
  
  // TODO(cais): Support grpc:// debug URLs in open source once Python grpc
  //   genrule becomes available. See b/23796275.
 -#ifndef PLATFORM_WINDOWS
 +#if 0
+ #include "grpcpp/channel.h"
  #include "tensorflow/core/debug/debug_service.grpc.pb.h"
  
- namespace tensorflow {
-diff --git a/tensorflow/contrib/cmake/external/abseil_cpp.cmake b/tensorflow/contrib/cmake/external/abseil_cpp.cmake
-index 46a193971c..9afab30de0 100644
---- a/tensorflow/contrib/cmake/external/abseil_cpp.cmake
-+++ b/tensorflow/contrib/cmake/external/abseil_cpp.cmake
-@@ -39,8 +39,8 @@ else (systemlib_ABSEIL_CPP)
-   include (ExternalProject)
- 
-   set(abseil_cpp_INCLUDE_DIR ${CMAKE_BINARY_DIR}/abseil_cpp/src/abseil_cpp)
--  set(abseil_cpp_URL https://github.com/abseil/abseil-cpp/archive/e01d95528ea2137a4a27a88d1f57c6cb260aafed.tar.gz)
--  set(abseil_cpp_HASH SHA256=84043ed402d2a2a6ba4cdddb7e85118b1158fd81fe4ac3a14adc343d054c1e2e)
-+  set(abseil_cpp_URL https://github.com/abseil/abseil-cpp/archive/cd86d0d20ab167c33b23d3875db68d1d4bad3a3b.tar.gz)
-+  #set(abseil_cpp_HASH SHA256=84043ed402d2a2a6ba4cdddb7e85118b1158fd81fe4ac3a14adc343d054c1e2e)
-   set(abseil_cpp_BUILD ${CMAKE_BINARY_DIR}/abseil_cpp/src/abseil_cpp-build)
- 
-   if(WIN32)
-@@ -73,14 +73,23 @@ else (systemlib_ABSEIL_CPP)
-         ${abseil_cpp_BUILD}/absl/base/libabsl_throw_delegate.a
-         ${abseil_cpp_BUILD}/absl/numeric/libabsl_int128.a
-         ${abseil_cpp_BUILD}/absl/strings/libabsl_strings.a
--        ${abseil_cpp_BUILD}/absl/strings/libstr_format_internal.a
-+        ${abseil_cpp_BUILD}/absl/strings/libabsl_str_format_internal.a
-+        ${abseil_cpp_BUILD}/absl/hash/libabsl_hash.a
-+        ${abseil_cpp_BUILD}/absl/container/libabsl_hashtablez_sampler.a
-+        ${abseil_cpp_BUILD}/absl/synchronization/libabsl_synchronization.a
-+        ${abseil_cpp_BUILD}/absl/debugging/libabsl_stacktrace.a
-+        ${abseil_cpp_BUILD}/absl/debugging/libabsl_symbolize.a
-+        ${abseil_cpp_BUILD}/absl/debugging/libabsl_debugging_internal.a
-+        ${abseil_cpp_BUILD}/absl/debugging/libabsl_demangle_internal.a
-+        ${abseil_cpp_BUILD}/absl/time/libabsl_time.a
-+        ${abseil_cpp_BUILD}/absl/time/libabsl_time_zone.a
-+        ${abseil_cpp_BUILD}/absl/hash/libabsl_city.a
-         ${abseil_cpp_BUILD}/absl/types/libabsl_bad_optional_access.a)
-   endif()
- 
-   ExternalProject_Add(abseil_cpp
-       PREFIX abseil_cpp
-       URL ${abseil_cpp_URL}
--      URL_HASH ${abseil_cpp_HASH}
-       DOWNLOAD_DIR "${DOWNLOAD_LOCATION}"
-       BUILD_BYPRODUCTS ${abseil_cpp_STATIC_LIBRARIES}
-       INSTALL_COMMAND ""
+
 diff --git a/tensorflow/contrib/cmake/tf_tools.cmake b/tensorflow/contrib/cmake/tf_tools.cmake
 index 58c7df95c8..28443c9bf6 100644
 --- a/tensorflow/contrib/cmake/tf_tools.cmake
@@ -482,3 +427,125 @@ index 58c7df95c8..28443c9bf6 100644
 +#        RUNTIME DESTINATION bin
 +#        LIBRARY DESTINATION lib
 +#        ARCHIVE DESTINATION lib)
+diff --git a/tensorflow/contrib/cmake/tf_core_ops.cmake b/tensorflow/contrib/cmake/tf_core_ops.cmake
+index f73f89ce37..0df72649c0 100644
+--- a/tensorflow/contrib/cmake/tf_core_ops.cmake
++++ b/tensorflow/contrib/cmake/tf_core_ops.cmake
+@@ -92,7 +92,6 @@ GENERATE_CONTRIB_OP_LIBRARY(boosted_trees_training "${tensorflow_source_dir}/ten
+ GENERATE_CONTRIB_OP_LIBRARY(boosted_trees_prediction "${tensorflow_source_dir}/tensorflow/contrib/boosted_trees/ops/prediction_ops.cc")
+ GENERATE_CONTRIB_OP_LIBRARY(boosted_trees_quantiles "${tensorflow_source_dir}/tensorflow/contrib/boosted_trees/ops/quantile_ops.cc")
+ GENERATE_CONTRIB_OP_LIBRARY(boosted_trees_stats_accumulator "${tensorflow_source_dir}/tensorflow/contrib/boosted_trees/ops/stats_accumulator_ops.cc")
+-GENERATE_CONTRIB_OP_LIBRARY(factorization_clustering "${tensorflow_source_dir}/tensorflow/contrib/factorization/ops/clustering_ops.cc")
+ GENERATE_CONTRIB_OP_LIBRARY(factorization_factorization "${tensorflow_source_dir}/tensorflow/contrib/factorization/ops/factorization_ops.cc")
+ GENERATE_CONTRIB_OP_LIBRARY(framework_variable "${tensorflow_source_dir}/tensorflow/contrib/framework/ops/variable_ops.cc")
+ GENERATE_CONTRIB_OP_LIBRARY(input_pipeline "${tensorflow_source_dir}/tensorflow/contrib/input_pipeline/ops/input_pipeline_ops.cc")
+diff --git a/tensorflow/contrib/cmake/tf_core_kernels.cmake b/tensorflow/contrib/cmake/tf_core_kernels.cmake
+index e8972098c7..f123e3d925 100644
+--- a/tensorflow/contrib/cmake/tf_core_kernels.cmake
++++ b/tensorflow/contrib/cmake/tf_core_kernels.cmake
+@@ -63,10 +63,8 @@ if(tensorflow_BUILD_CONTRIB_KERNELS)
+       "${tensorflow_source_dir}/tensorflow/contrib/boosted_trees/ops/split_handler_ops.cc"
+       "${tensorflow_source_dir}/tensorflow/contrib/boosted_trees/ops/stats_accumulator_ops.cc"
+       "${tensorflow_source_dir}/tensorflow/contrib/boosted_trees/ops/training_ops.cc"
+-      "${tensorflow_source_dir}/tensorflow/contrib/factorization/kernels/clustering_ops.cc"
+       "${tensorflow_source_dir}/tensorflow/contrib/factorization/kernels/masked_matmul_ops.cc"
+       "${tensorflow_source_dir}/tensorflow/contrib/factorization/kernels/wals_solver_ops.cc"
+-      "${tensorflow_source_dir}/tensorflow/contrib/factorization/ops/clustering_ops.cc"
+       "${tensorflow_source_dir}/tensorflow/contrib/factorization/ops/factorization_ops.cc"
+       #"${tensorflow_source_dir}/tensorflow/contrib/ffmpeg/decode_audio_op.cc"
+       #"${tensorflow_source_dir}/tensorflow/contrib/ffmpeg/encode_audio_op.cc"
+@@ -110,11 +108,6 @@ if(tensorflow_BUILD_CONTRIB_KERNELS)
+       "${tensorflow_source_dir}/tensorflow/contrib/tensor_forest/hybrid/core/ops/utils.cc"
+       "${tensorflow_source_dir}/tensorflow/contrib/text/kernels/skip_gram_kernels.cc"
+       "${tensorflow_source_dir}/tensorflow/contrib/text/ops/skip_gram_ops.cc"
+-      "${tensorflow_source_dir}/tensorflow/contrib/tpu/ops/cross_replica_ops.cc"
+-      "${tensorflow_source_dir}/tensorflow/contrib/tpu/ops/infeed_ops.cc"
+-      "${tensorflow_source_dir}/tensorflow/contrib/tpu/ops/outfeed_ops.cc"
+-      "${tensorflow_source_dir}/tensorflow/contrib/tpu/ops/replication_ops.cc"
+-      "${tensorflow_source_dir}/tensorflow/contrib/tpu/ops/tpu_configuration_ops.cc"
+     )
+   list(APPEND tf_core_kernels_srcs ${tf_contrib_kernels_srcs})
+ endif(tensorflow_BUILD_CONTRIB_KERNELS)
+diff --git a/tensorflow/contrib/cmake/external/png.cmake b/tensorflow/contrib/cmake/external/png.cmake
+index c102b327dc..8fad13c207 100644
+--- a/tensorflow/contrib/cmake/external/png.cmake
++++ b/tensorflow/contrib/cmake/external/png.cmake
+@@ -16,7 +16,7 @@ include (ExternalProject)
+ include (GNUInstallDirs)
+ 
+ set(png_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/external/png_archive)
+-set(png_URL https://mirror.bazel.build/github.com/glennrp/libpng/archive/v1.6.37.tar.gz)
++set(png_URL https://github.com/glennrp/libpng/archive/v1.6.37.tar.gz)
+ set(png_HASH SHA256=ca74a0dace179a8422187671aee97dd3892b53e168627145271cad5b5ac81307)
+ set(png_BUILD ${CMAKE_BINARY_DIR}/png/src/png)
+ set(png_INSTALL ${CMAKE_BINARY_DIR}/png/install)
+diff --git a/tensorflow/contrib/cmake/external/sqlite.cmake b/tensorflow/contrib/cmake/external/sqlite.cmake
+index ef9226a938..01d5b51722 100644
+--- a/tensorflow/contrib/cmake/external/sqlite.cmake
++++ b/tensorflow/contrib/cmake/external/sqlite.cmake
+@@ -15,7 +15,7 @@
+ include (ExternalProject)
+ 
+ set(sqlite_INCLUDE_DIR ${CMAKE_CURRENT_BINARY_DIR}/external/sqlite)
+-set(sqlite_URL https://mirror.bazel.build/www.sqlite.org/2019/sqlite-amalgamation-3280000.zip)
++set(sqlite_URL https://www.sqlite.org/2019/sqlite-amalgamation-3280000.zip)
+ set(sqlite_HASH SHA256=d02fc4e95cfef672b45052e221617a050b7f2e20103661cda88387349a9b1327)
+ set(sqlite_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sqlite/src/sqlite)
+ set(sqlite_INSTALL ${CMAKE_CURRENT_BINARY_DIR}/sqlite/install)
+diff --git a/tensorflow/core/protobuf/conv_autotuning.proto b/tensorflow/core/protobuf/conv_autotuning.proto
+index c75f530695..cb352e158e 100644
+--- a/tensorflow/core/protobuf/conv_autotuning.proto
++++ b/tensorflow/core/protobuf/conv_autotuning.proto
+@@ -1,5 +1,6 @@
+ // This is used for convolution logging. Also see
+ // tensorflow/core/protobuf/autotuing.h
++/*
+ syntax = "proto3";
+ 
+ package tensorflow;
+@@ -23,3 +24,4 @@ message ConvolutionProto {
+ 
+   stream_executor.dnn.ActivationMode activation = 8;
+ }
++*/
+diff --git a/tensorflow/contrib/cmake/external/abseil_cpp.cmake b/tensorflow/contrib/cmake/external/abseil_cpp.cmake
+index 53ad3648d6..aea89114ba 100644
+--- a/tensorflow/contrib/cmake/external/abseil_cpp.cmake
++++ b/tensorflow/contrib/cmake/external/abseil_cpp.cmake
+@@ -40,7 +40,7 @@ else (systemlib_ABSEIL_CPP)
+ 
+   set(abseil_cpp_INCLUDE_DIR ${CMAKE_BINARY_DIR}/abseil_cpp/src/abseil_cpp_build)
+   set(abseil_cpp_URL https://github.com/abseil/abseil-cpp.git)
+-  set(abseil_cpp_TAG master)
++  set(abseil_cpp_TAG lts_2019_08_08)
+   set(abseil_cpp_BUILD ${CMAKE_BINARY_DIR}/abseil_cpp/src/abseil_cpp_build)
+ 
+   if(WIN32)
+@@ -77,7 +77,18 @@ else (systemlib_ABSEIL_CPP)
+         ${abseil_cpp_BUILD}/absl/base/libabsl_throw_delegate.a
+         ${abseil_cpp_BUILD}/absl/numeric/libabsl_int128.a
+         ${abseil_cpp_BUILD}/absl/strings/libabsl_strings.a
+-        ${abseil_cpp_BUILD}/absl/strings/libstr_format_internal.a
++        ${abseil_cpp_BUILD}/absl/strings/libabsl_strings_internal.a
++        ${abseil_cpp_BUILD}/absl/strings/libabsl_str_format_internal.a
++        ${abseil_cpp_BUILD}/absl/hash/libabsl_hash.a
++        ${abseil_cpp_BUILD}/absl/container/libabsl_hashtablez_sampler.a
++        ${abseil_cpp_BUILD}/absl/synchronization/libabsl_synchronization.a
++        ${abseil_cpp_BUILD}/absl/debugging/libabsl_stacktrace.a
++        ${abseil_cpp_BUILD}/absl/debugging/libabsl_symbolize.a
++        ${abseil_cpp_BUILD}/absl/debugging/libabsl_debugging_internal.a
++        ${abseil_cpp_BUILD}/absl/debugging/libabsl_demangle_internal.a
++        ${abseil_cpp_BUILD}/absl/time/libabsl_time.a
++        ${abseil_cpp_BUILD}/absl/time/libabsl_time_zone.a
++        ${abseil_cpp_BUILD}/absl/hash/libabsl_city.a
+         ${abseil_cpp_BUILD}/absl/time/libabsl_time.a
+         ${abseil_cpp_BUILD}/absl/types/libabsl_bad_optional_access.a)
+   endif()
+@@ -85,6 +85,7 @@ else (systemlib_ABSEIL_CPP)
+   ExternalProject_Add(abseil_cpp_build
+       PREFIX abseil_cpp
+       GIT_REPOSITORY ${abseil_cpp_URL}
++      GIT_TAG ${abseil_cpp_TAG}
+       DOWNLOAD_DIR "${DOWNLOAD_LOCATION}"
+       BUILD_IN_SOURCE 1
+       BUILD_BYPRODUCTS ${abseil_cpp_STATIC_LIBRARIES}
