@@ -32,7 +32,8 @@ cmake -DTENSORFLOW_STATIC=OFF -DTENSORFLOW_SHARED=ON -DTENSORFLOW_TAG=v1.14.0 \
 make && make install || exit 1
 
 # Copy/prepare the final binaries
-cp ${DIR}/tensorflow_cc/install/lib/tensorflow_cc/libtensorflow_cc.so ${DIR}/packaging/libs/ || exit 1
+cp ${DIR}/tensorflow_cc/install/lib/tensorflow_cc/libtensorflow_cc.so ${DIR}/packaging/libs/libtensorflow_cc.so.1 || exit 1
 cp ${DIR}/tensorflow_cc/install/lib/tensorflow_cc/libprotobuf.a ${DIR}/packaging/libs/ || exit 1
+ln -s libtensorflow_cc.so.1 ${DIR}/packaging/libs/libtensorflow_cc.so || exit 1
 
 echo READY! Libraries are extracted to ${DIR}/packaging/libs/

@@ -98,7 +98,7 @@ ENDIF ()
 SET(INSTALL_LIBS libs/libnsync-tf.a libs/libprotobuf-tf.so libs/libprotobuf-tf-static.a libs/libtensorflow-core.so libs/libtensorflow-core-static.a 
     ${EXTRA_INSTALL_LIBS})
 IF (${PKG_SUFFIX} STREQUAL "generic-cuda" OR ${PKG_SUFFIX} STREQUAL "optimized-cuda")
-  SET(INSTALL_LIBS libs/libprotobuf.a libs/libtensorflow_cc.so)
+  SET(INSTALL_LIBS libs/libprotobuf.a libs/libtensorflow_cc.so libs/libtensorflow_cc.so.1)
 ENDIF ()
 
 INSTALL(DIRECTORY headers/absl headers/Eigen headers/google headers/tensorflow headers/third_party headers/unsupported
