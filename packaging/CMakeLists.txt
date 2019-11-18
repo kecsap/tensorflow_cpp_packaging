@@ -44,6 +44,10 @@ IF (NOT RELEASE_MODE)
     SET(EXTRA_LIBS "-ltf_protos_cc -fopenmp -lpng16 -lsqlite3 -lsnappy -lgif -ldouble-conversion -llmdb -lre2 -ljpeg -lz -lfarmhash -licuuc -ljsoncpp")
     SET(EXTRA_STATIC_LIBS "")
     SET(EXTRA_DEPS ", libdouble-conversion-dev, libfarmhash-dev, libre2-dev, libgif-dev, libpng-dev, libsqlite3-dev, libsnappy-dev, liblmdb-dev, libjpeg-dev, libicu-dev, libjsoncpp-dev")
+  ELSEIF (${PKG_SUFFIX} STREQUAL "generic-cuda" OR ${PKG_SUFFIX} STREQUAL "optimized-cuda")
+    SET(EXTRA_LIBS "")
+    SET(EXTRA_STATIC_LIBS "")
+    SET(EXTRA_DEPS ", libdouble-conversion-dev, libfarmhash-dev, libre2-dev, libgif-dev, libpng-dev, libsqlite3-dev, libsnappy-dev, liblmdb-dev, libjpeg-dev, libicu-dev, libjsoncpp-dev, libprotobuf-dev")
   ELSE ()
     SET(EXTRA_LIBS "")
     SET(EXTRA_STATIC_LIBS "${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtf_protos_cc-static.a")
@@ -76,7 +80,7 @@ IF (NOT RELEASE_MODE)
   # Override TENSORFLOWCPP_LIBS and TENSORFLOWCPP_STATIC_LIBS for CUDA version
   IF (${PKG_SUFFIX} STREQUAL "generic-cuda" OR ${PKG_SUFFIX} STREQUAL "optimized-cuda")
     SET(TENSORFLOWCPP_LIBS -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp -L${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp
-      -ltensorflow_cc -Wl,--no-as-needed ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libprotobuf.a -Wl,--as-needed)
+      -ltensorflow_cc -lprotobuf)
     SET(TENSORFLOWCPP_STATIC_LIBS "")
   ENDIF ()
 
@@ -98,7 +102,7 @@ ENDIF ()
 SET(INSTALL_LIBS libs/libnsync-tf.a libs/libprotobuf-tf.so libs/libprotobuf-tf-static.a libs/libtensorflow-core.so libs/libtensorflow-core-static.a 
     ${EXTRA_INSTALL_LIBS})
 IF (${PKG_SUFFIX} STREQUAL "generic-cuda" OR ${PKG_SUFFIX} STREQUAL "optimized-cuda")
-  SET(INSTALL_LIBS libs/libprotobuf.a libs/libtensorflow_cc.so libs/libtensorflow_cc.so.1)
+  SET(INSTALL_LIBS libs/libtensorflow_cc.so libs/libtensorflow_cc.so.1)
 ENDIF ()
 
 INSTALL(DIRECTORY headers/absl headers/Eigen headers/google headers/tensorflow headers/third_party headers/unsupported
