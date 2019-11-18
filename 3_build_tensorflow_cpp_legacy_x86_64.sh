@@ -94,6 +94,5 @@ cp $DIR/tensorflow/fft2d_fix/libtensorflow.a $DIR/packaging/libs/libtensorflow-c
 g++ -shared -o $DIR/packaging/libs/libtensorflow-core.so -Wl,--whole-archive -l:libtensorflow-core-static.a -L$DIR/packaging/libs/ -Wl,--no-whole-archive -Wl,--allow-multiple-definition || exit 1
 cp tensorflow/contrib/cmake/libtf_protos_cc.a $DIR/packaging/libs/libtf_protos_cc-static.a || exit 1
 g++ -shared -o $DIR/packaging/libs/libtf_protos_cc.so -Wl,--whole-archive -l:libtf_protos_cc-static.a -L$DIR/packaging/libs/ -Wl,--no-whole-archive || exit 1
-cp tensorflow/contrib/cmake/libtf_core_profiler.a $DIR/packaging/libs/libtf_core_profiler.a || exit 1
 
 echo READY! Libraries are extracted to $DIR/packaging/libs/

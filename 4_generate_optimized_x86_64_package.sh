@@ -23,7 +23,7 @@ fi
 # Get some git information
 cd $DIR/tensorflow
 #TAG=$(git describe --tags $(git rev-list --tags --max-count=1) | tr -d 'v')
-TAG=1.14.0
+TAG=1.13.1
 COMMIT=$(git rev-parse --short HEAD)
 DATE=$(git log -1 --date=short --pretty=format:%cd | tr -d '-')
 

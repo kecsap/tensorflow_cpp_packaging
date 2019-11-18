@@ -18,9 +18,9 @@ fi
 
 # Get some git information
 cd $DIR/tensorflow
-TAG=1.14.0
-COMMIT=87989f6959
-DATE=20190618
+TAG=1.13.1
+COMMIT=6612da8951
+DATE=20190225
 
 # Configure & build the package
 cd $DIR/packaging

@@ -66,12 +66,11 @@ IF (NOT RELEASE_MODE)
   ENDIF ()
 
   SET(TENSORFLOWCPP_LIBS -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp -L${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp
-      -ltensorflow-core -Wl,--no-as-needed -lprotobuf-tf ${ABSL_LIBRARY} ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtf_core_profiler.a
+      -ltensorflow-core -Wl,--no-as-needed -lprotobuf-tf ${ABSL_LIBRARY}
       ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libnsync-tf.a ${NSYNC_CPP_LIBRARY}
       ${EXTRA_LIBS} -Wl,--as-needed -ldl -lpthread)
   SET(TENSORFLOWCPP_STATIC_LIBS -Wl,-rpath=${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp -L${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp
       -Wl,--whole-archive ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtensorflow-core-static.a ${EXTRA_STATIC_LIBS}
-      ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libtf_core_profiler.a
       ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libprotobuf-tf-static.a -Wl,--no-whole-archive -Wl,--allow-multiple-definition
       ${ABSL_LIBRARY}
       ${CMAKE_INSTALL_PREFIX}/lib/tensorflow-cpp/libnsync-tf.a ${NSYNC_CPP_LIBRARY}
@@ -94,7 +93,7 @@ ENDIF ()
 IF (${PKG_SUFFIX} STREQUAL "rpi")
   SET(EXTRA_INSTALL_LIBS "")
 ELSEIF (${PKG_SUFFIX} STREQUAL "generic" OR ${PKG_SUFFIX} STREQUAL "optimized" OR ${PKG_SUFFIX} STREQUAL "legacy")
-  SET(EXTRA_INSTALL_LIBS libs/libnsync-cpp-tf.a libs/libtf_protos_cc.so libs/libtf_protos_cc-static.a libs/libabsl.a libs/libtf_core_profiler.a)
+  SET(EXTRA_INSTALL_LIBS libs/libnsync-cpp-tf.a libs/libtf_protos_cc.so libs/libtf_protos_cc-static.a libs/libabsl.a)
 ELSE ()
   SET(EXTRA_INSTALL_LIBS libs/libnsync-cpp-tf.a libs/libabsl.a)
 ENDIF ()
